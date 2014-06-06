@@ -12,15 +12,18 @@
 using namespace std;
 
 
-FileIOError::FileIOError(const string&msg, const string& fileName, const string& thrownInFile, const int& thrownInRow):
+FileIOError::
+FileIOError(const string&msg, const string& fileName, const string& thrownInFile, const int& thrownInRow):
             itsMessage(msg), itsFileName(fileName), itsThrownInFile(thrownInFile), itsThrownInRow(thrownInRow){
-
 }
 
-void FileIOError::PrintMessage() const {
+
+void FileIOError::
+PrintMessage() const {
+    cout<<"ERROR: ";
     cout<<itsMessage<<endl;
-    cout<<"File Name: \'"<<itsFileName<<endl;
-    cout<<"Exception was thrown in: \n"<<itsThrownInFile<<"; Row: "<<itsThrownInRow<<endl;
+    cout<<"File Name: \'"<<itsFileName<<"\'"<<endl;
+    cout<<"Exception was thrown in: \n"<<itsThrownInFile<<"; \nRow: "<<itsThrownInRow<<endl;
 }
 
 

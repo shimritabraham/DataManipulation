@@ -13,8 +13,28 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include "FileInputManager.h"
+using namespace std;
 
-template<class T>
+
+//namespace MatrixFactories
+//{
+//    template< class T>
+//    Matrix<T> createSimpleMatrix();
+//
+//    Matrix createSimpleMatrix(const string& filename)
+//    Matrix createSimpleMatrixZeros(int i, int j);
+//
+//    Matrix createSparseMatrix();
+//}
+//
+//class SparseContainer;
+//class FullContainer;
+//
+//Matrix<double, SparseContainer> sparseMatrix;
+//
+
+template< class T>
 class Matrix{
 
     public:
@@ -22,9 +42,7 @@ class Matrix{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Con/De structors ~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Matrix(const std::string& filename, const T& type);
-    Matrix(const std::ifstream, const T& type);
+    Matrix(const std::string& filename);
     ~Matrix(){}
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,17 +50,17 @@ class Matrix{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // accessors
-    int GetNrCols() const;
-    int GetNrRows() const;
+    size_t GetNrCols() const {return (itsRawData[0]).size();};
+    size_t GetNrRows() const {return itsRawData.size();};
 
     // printing
     std::ostream& operator<< (std::ostream& out);
 
     // operators -- read/write
-    const std::vector<T>& operator() (const int& rowIdx, const int& colIdx)const;
-          std::vector<T>& operator() (const int& rowIdx, const int& colIdx);
-    const std::vector<T>& operator() (const std::string& rowName, const std::string& colName)const ;
-          std::vector<T>& operator() (const std::string& rowName, const std::string& colName);
+    const T& operator() (const int& rowIdx, const int& colIdx)const;
+       T& operator() (const int& rowIdx, const int& colIdx);
+    const T& operator() (const std::string& rowName, const std::string& colName)const ;
+          T& operator() (const std::string& rowName, const std::string& colName);
 
     const std::vector<T>& row(const int& idx) const;
           std::vector<T>& row(const int& idx);
@@ -55,18 +73,77 @@ class Matrix{
           std::vector<T>& col(const std::string& name);
 
     // Utils
-    void SortByRowLabels();
+    void ValidateObject() const;//e.g.: make sure its square.
+    void SortByRowLabels(); // make 2 versions: in place and copy. Make  this into a normal function
+
+    // Friends
+    template<class S>
+    friend ostream& operator<< (ostream& str,  Matrix<S>& mat);
 
     private:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Data Members ~~~~~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    std::vector<std::vector<T>> mRawData;       // Each column is a vector --> extendable to diff types per column
-    std::vector<std::string> mRowNames;
-    std::vector<std::string> mColNames;
+//    M itsRawDataNew;
+    std::vector<std::vector<T>> itsRawData;       // Each row is a vector
+    std::vector<std::string> itsRowNames;
+    std::vector<std::string> itsColNames;
 };
 
 template<class T>
 Matrix<T> intersect(const Matrix<T>& mat, const std::vector<std::string>& labels);
+
+
+template<class T>
+Matrix<T>::Matrix(const string& fileName){
+
+    FileInputManager<T> fmgr(fileName);
+    try{
+        while(!fmgr.IsEOF()){
+
+            vector<T> a = fmgr.ReadNextCSVLine();
+
+            //Make sure we did not reach EOF before adding it to itsRawData
+            if(!fmgr.IsEOF()){
+                itsRawData.push_back(a);
+            }
+        }
+
+
+    }catch(FileIOError err){
+        err.PrintMessage();
+    }
+}
+
+template<class T>
+T& Matrix<T>::
+operator() (const int& rowIdx, const int& colIdx){
+    return itsRawData[rowIdx][colIdx];
+}
+
+template<class T>
+const T& Matrix<T>::
+operator() (const int& rowIdx, const int& colIdx) const {
+    return itsRawData[rowIdx][colIdx];
+}
+
+template<class S>
+ostream& operator<< (ostream& str,  Matrix<S>& mat){
+    size_t nRows = mat.GetNrRows();
+    size_t nCols = mat.GetNrCols();
+    str<<"Member \'itsRawData\'"<<"("<<nRows<<"x"<<nCols<<"):"<<endl;
+    for (int i=0; i<nRows; i++){
+        for (int j=0; j<nCols; j++){
+            str<<mat(i, j);
+
+        }
+        str<<endl;
+    }
+    return str;
+}
+
+
 #endif
+
+
