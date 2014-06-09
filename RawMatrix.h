@@ -38,13 +38,37 @@ public:
     // Utils functions
     template<class S>
     friend ostream& operator<< (ostream& str,  RawMatrix<S>& mat);
-
+    bool Validate() const;
 
 private:
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
 
 
 };
+
+
+template<class T>
+bool RawMatrix<T>::
+Validate() const{
+
+    // check that there is at least one row
+    size_t nRows = (*itsPRawMatrixData).size();
+    if(nRows == 0)
+        throw string("RawMatrix has zero rows");
+
+    // check that there is at least one column
+    size_t nCols = (*itsPRawMatrixData)[0].size();
+    if(nCols == 0)
+        throw string("RawMatrix has zero columns");
+
+    // check that all columns are of equal size
+    for(size_t i = 0; i<nCols; i++){
+        if((*itsPRawMatrixData)[i].size() != nCols)
+            throw string("Columns are not of equal size");
+    }
+    return true;
+}
+
 
 
 template<class T>
@@ -101,14 +125,12 @@ RawMatrix(const string& fileName){
             (*pData).push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
         }
 
-        // if any of the vector elements has length zero, something went wrong:
-        for(size_t i=0; i<(*pData).size(); i++){
-            if((*pData)[i].size() == 0)
-                throw "Unable to create the required vector (inconsistent data types?) ";
-
         itsPRawMatrixData=pData;
 
-        }
+        // Check the integrity of the object
+        Validate();
+
+
     }catch (string&   str){
         cout<<str<<endl;
         exit(1);
