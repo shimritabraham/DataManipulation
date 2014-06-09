@@ -14,9 +14,9 @@
 #include <iostream>
 #include <utility>
 #include <iomanip>
+#include <iterator>
 #include "FileInputManager.h"
 #include "RawMatrix.h"
-
 using namespace std;
 
 typedef vector<string> strVec;
@@ -50,8 +50,8 @@ public:
     std::ostream& operator<< (std::ostream& out);
 
     // operators -- read/write
-    const T& operator() (const int& rowIdx, const int& colIdx)const;
-          T& operator() (const int& rowIdx, const int& colIdx);
+    const T& operator() (const int& rowIdx, const int& colIdx)const {return itsRawData(rowIdx, colIdx);};
+          T& operator() (const int& rowIdx, const int& colIdx)      {return itsRawData(rowIdx, colIdx);};
     const T& operator() (const std::string& rowName, const std::string& colName)const ;
           T& operator() (const std::string& rowName, const std::string& colName);
 
@@ -121,17 +121,39 @@ Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
     }
 }
 
-template<class T>
-T& Matrix<T>::
-operator() (const int& rowIdx, const int& colIdx){
-    return itsRawData(rowIdx, colIdx);
-}
 
 template<class T>
 const T& Matrix<T>::
-operator() (const int& rowIdx, const int& colIdx) const {
-    return itsRawData(rowIdx, colIdx);
+operator() (const std::string& rowName, const std::string& colName)const{
+
+    // find mapping between string indices to location in the matrix
+    vector<string>::const_iterator rowIter = find(itsRowNames.begin(), itsRowNames.end(), rowName);
+    vector<string>::const_iterator colIter = find(itsColNames.begin(), itsColNames.end(), colName);
+
+    int i = distance(itsRowNames.begin(), rowIter);
+    int j = distance(itsColNames.begin(), colIter);
+
+    // find the element in the underlying raw data
+    return itsRawData(i, j);
 }
+
+template<class T>
+T& Matrix<T>::
+operator() (const std::string& rowName, const std::string& colName){
+
+    // find mapping between string indices to location in the matrix
+    vector<string>::iterator rowIter = find(itsRowNames.begin(), itsRowNames.end(), rowName);
+    vector<string>::iterator colIter = find(itsColNames.begin(), itsColNames.end(), colName);
+
+    size_t i = distance(itsRowNames.begin(), rowIter);
+    size_t j = distance(itsColNames.begin(), colIter);
+
+    // find the element in the underlying raw data
+    return itsRawData((int) i, (int) j);
+
+}
+
+
 
 template<class S>
 ostream& operator<< (ostream& str,  Matrix<S>& mat){

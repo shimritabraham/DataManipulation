@@ -31,10 +31,9 @@ int main(int argc, const char * argv[])
     Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
     cout<<a<<endl;
 
-    vector<int>* m = new vector<int>;
-    foo(m);
-    foo(m);
-    
+    a("abird", "secondCol") = 5.;
+    cout<<a<<endl;
+
 
 
     return 0;
