@@ -26,8 +26,8 @@ int main(int argc, const char * argv[])
     //params:
     string fileName = "/Users/shimritabraham/Documents/work/data.csv";
 
-    Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName);
-    cout<<a<<endl;
+    Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true);
+    cout<<a.GetColNames()[1]<<endl;
 
 
     return 0;

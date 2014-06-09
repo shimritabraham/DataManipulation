@@ -9,9 +9,13 @@
 #ifndef DataManipulation_MatrixFactory_h
 #define DataManipulation_MatrixFactory_h
 
+#include <algorithm>
+#include <cctype>
 #include "Matrix.h"
 #include "RawMatrix.h"
 #include "FileInputManager.h"
+
+using namespace std;
 
 namespace MatrixFactory{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,7 +23,7 @@ namespace MatrixFactory{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     template<class T>
-    Matrix<T> CreateSimpleMatrixFromCsv(const string& fileName);
+    Matrix<T> CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
     template<class T>
     Matrix<T> CreateSimpleMatrixFromVectors(const vector< vector<T> >& vecvec);
 
@@ -40,13 +44,38 @@ namespace {
 
 
 template<class T>
-Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName){
+Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
 
-    RawMatrix<T> rawData(fileName);
-    strVec rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
-    strVec colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
+    if(!hasColLabels && !hasRowLabels){
+        RawMatrix<T> rawData(fileName);
+        strVec rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
+        strVec colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
 
-    return Matrix<T>(rawData, rowNames, colNames);
+        return Matrix<T>(rawData, rowNames, colNames);
+
+    }else if(hasColLabels && !hasRowLabels){
+        // read column labels
+        FileInputManager<T> fmgr(fileName);
+        fmgr.ValidateObject();
+        string line;
+        getline(fmgr.GetStream(), line, '\r');
+
+        line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end()); //get rid of white space
+        replace(line.begin(), line.end(), ',', ' '); // turn commas into spaces for easy conversion into vector
+        stringstream in(line);
+        strVec colNames = strVec(istream_iterator<string>(in), istream_iterator<string>());
+
+        RawMatrix<T> rawData(fmgr.GetStream());
+        strVec rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
+
+        return Matrix<T>(rawData, rowNames, colNames);
+
+    }else{
+        throw string("Not implemented");
+    }
+
+
+
 }
 
 

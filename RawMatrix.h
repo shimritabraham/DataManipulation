@@ -25,6 +25,7 @@ class RawMatrix{
 public:
     // Con/Destructors
     RawMatrix(const string& fileName);
+    RawMatrix(istream& ifstream);
     ~RawMatrix(){};
 
 
@@ -74,6 +75,7 @@ namespace{
             throw string("Inconsistent data types found in file ");
 
         // process string to make it easily convertible to a vector
+        line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end()); //get rid of white space
         replace(line.begin(), line.end(), ',', ' ');
         stringstream in(line);
 
@@ -82,7 +84,7 @@ namespace{
         
         return result;
     }
-    
+
     
 }
 
@@ -152,7 +154,30 @@ RawMatrix(const string& fileName){
     }
 }
 
+template<class T>
+RawMatrix<T>::
+RawMatrix(istream& ifstream){
 
+    try{
+        // Read the file line by line and store the data in a vector of vectors where each row is a vector
+        string line;
+        boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
+
+        while(getline(ifstream, line, '\r')){
+            *pData = ProcessLine(*pData, line);
+        }
+
+        itsPRawMatrixData=pData;
+
+        // Check the integrity of the object
+        ValidateObject();
+
+
+    }catch (string&   str){
+        cout<<str<<endl;
+        exit(1);
+    }
+}
 
 
 template<class S>

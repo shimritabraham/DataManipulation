@@ -127,7 +127,7 @@ operator() (const int& rowIdx, const int& colIdx) const {
 template<class S>
 ostream& operator<< (ostream& str,  Matrix<S>& mat){
 
-    const int& fieldWidth = 8;
+    const int& fieldWidth = 15;
 
     size_t nRows = mat.GetNrRows();
     size_t nCols = mat.GetNrCols();
