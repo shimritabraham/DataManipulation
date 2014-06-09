@@ -16,9 +16,12 @@
 
 template<class T>
 class RawMatrix{
-    // This should not be created directly by the user.
-    // Instead, please use the available MatrixFactly functions
-    // Initially, this class uses a vector of vectors to store matrix data. This can be expanded to gain more speed later.
+    // This should not be used directly by the user.
+    // Instead, please create a Matrix object using the available MatrixFactory functions
+
+
+    // FIXME: Initially, this class uses a vector of vectors to store matrix data. This can be expanded to gain more speed later.
+
 public:
     // Con/Destructors
     RawMatrix(const string& fileName);
@@ -45,6 +48,43 @@ private:
 
 
 };
+
+
+namespace{
+    // Helper functions which are not meant to be called directly
+
+
+    bool OnlyNumbers(const string& str){
+        // Are all characters either numeric, a space or a dot?
+        // Helper function to read data and assert type consistency
+
+        int sumNums = 0;
+        for(size_t i = 0; i< str.size(); i++){
+            if ((isnumber(str[i]) || isspace(str[i]) || str[i] == '.' || str[i] == ','))
+                sumNums++;
+        }
+        return (sumNums == str.size());
+    }
+
+
+    template<class T>
+    vector<vector<T>>& ProcessLine(vector<vector<T>>& result, string& line){
+        // check type consistency of this line: either everything is numeric, or not and T is string
+        if(!OnlyNumbers(line) && !std::is_same<T, string>::value)
+            throw string("Inconsistent data types found in file ");
+
+        // process string to make it easily convertible to a vector
+        replace(line.begin(), line.end(), ',', ' ');
+        stringstream in(line);
+
+        // add row of data to result
+        result.push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
+        
+        return result;
+    }
+    
+    
+}
 
 
 template<class T>
@@ -83,21 +123,6 @@ operator() (const int& rowIdx, const int& colIdx) const {
 }
 
 
-namespace{
-    bool OnlyNumbers(const string& str);
-    bool OnlyNumbers(const string& str){
-        // Are all characters either numeric, a space or a dot?
-        // Helper function to read data and assert type consistency
-
-        int sumNums = 0;
-        for(size_t i = 0; i< str.size(); i++){
-            if ((isnumber(str[i]) || isspace(str[i]) || str[i] == '.' || str[i] == ','))
-                sumNums++;
-        }
-        return (sumNums == str.size());
-    }
-
-}
 
 
 template<class T>
@@ -112,16 +137,7 @@ RawMatrix(const string& fileName){
         boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
 
         while(getline(fmgr.GetStream(), line, '\r')){
-            // check type consistency of this line: either everything is numeric, or not and T is string
-            if(!OnlyNumbers(line) && !std::is_same<T, string>::value)
-                throw string("Inconsistent data types found in file ")+fileName;
-
-            // process string to make it easily convertible to a vector
-            replace(line.begin(), line.end(), ',', ' ');
-            stringstream in(line);
-
-            // add row of data to result
-            (*pData).push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
+            *pData = ProcessLine(*pData, line);
         }
 
         itsPRawMatrixData=pData;
