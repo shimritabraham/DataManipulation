@@ -27,8 +27,8 @@ public:
 
     // Member Functions
     void ValidateObject() const;
-    vector<T> ReadNextCSVLine();
     bool IsEOF();
+    ifstream& GetStream(){return itsStream;}
     
 
 private:
@@ -76,39 +76,6 @@ IsEOF(){
 }
 
 
-template<class T>
-vector<T> FileInputManager<T>::
-ReadNextCSVLine(){
-    //Note: We don't know if EOF is reached until we have read it. If EOF is reached, return an empty vector.
-
-    //checks
-    ValidateObject();
-    if(IsEOF()){
-        throw FileIOError("EOF reached. ", itsFileName, __FILE__, __LINE__);
-    }
-
-    // read line with commas, possibly reached EOF
-    string line;
-    getline(itsStream, line, '\r');
-
-    // If EOF is reached, return empty vector
-    vector<T> data;
-    if (IsEOF())
-        return data;
-
-    // change commas to spaces so we can make a vector easily
-    replace(line.begin(), line.end(), ',', ' ');
-    stringstream in(line);
-    data = vector<T>(istream_iterator<T>(in), istream_iterator<T>());
-
-    // check that something was read at all
-    if(data.size() == 0 && !IsEOF()){
-        throw FileIOError("Unable to create the required vector (inconsistent data types?) ", itsFileName, __FILE__, __LINE__);
-    }
-
-    return data;
-
-}
 
 
 
