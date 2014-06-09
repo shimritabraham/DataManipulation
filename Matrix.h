@@ -80,7 +80,7 @@ private:
     // ~~~~~~~~~~ Data Members ~~~~~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    RawMatrix<T> itsRawData;
+    RawMatrix<T> itsRawData;  // this can potentially be templetized later
     strVec itsRowNames;
     strVec itsColNames;
 };
@@ -109,7 +109,16 @@ Matrix<T>::
 Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
     itsRawData(rawData), itsRowNames(rowNames), itsColNames(colNames)
 {
-    ValidateObject();
+    try{
+        ValidateObject();
+    }catch(string& str){
+        cout<<str<<endl;
+        exit(1);
+    }
+    catch(...){
+        cout<<"Exception occured"<<endl;
+        exit(1);
+    }
 }
 
 template<class T>

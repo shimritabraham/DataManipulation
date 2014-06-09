@@ -66,6 +66,10 @@ ValidateObject() const{
         err.PrintMessage();
         exit(1);
     }
+    catch(...){
+        cout<<"Exception occured"<<endl;
+        exit(1);
+    }
 }
 
 

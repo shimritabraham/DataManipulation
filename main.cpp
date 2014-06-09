@@ -16,18 +16,25 @@ typedef vector<double> tdDoubleVec;
 
 
 
+void foo(vector<int>* p){
+    (*p).push_back(3);
+}
+
 
 
 int main(int argc, const char * argv[])
 {
 
-    //assuming the file has no colnames and no rownames!
-
     //params:
     string fileName = "/Users/shimritabraham/Documents/work/data.csv";
 
-    Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true);
-    cout<<a.GetColNames()[1]<<endl;
+    Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
+    cout<<a<<endl;
+
+    vector<int>* m = new vector<int>;
+    foo(m);
+    foo(m);
+    
 
 
     return 0;

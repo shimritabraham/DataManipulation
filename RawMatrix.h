@@ -26,6 +26,8 @@ public:
     // Con/Destructors
     RawMatrix(const string& fileName);
     RawMatrix(istream& ifstream);
+    RawMatrix(boost::shared_ptr<vector<vector<T>>> pData);
+    RawMatrix();
     ~RawMatrix(){};
 
 
@@ -68,8 +70,9 @@ namespace{
     }
 
 
+
     template<class T>
-    vector<vector<T>>& ProcessLine(vector<vector<T>>& result, string& line){
+    void ProcessLine(boost::shared_ptr<vector<vector<T>>> result, string& line){
         // check type consistency of this line: either everything is numeric, or not and T is string
         if(!OnlyNumbers(line) && !std::is_same<T, string>::value)
             throw string("Inconsistent data types found in file ");
@@ -80,9 +83,8 @@ namespace{
         stringstream in(line);
 
         // add row of data to result
-        result.push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
+        (*result).push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
         
-        return result;
     }
 
     
@@ -125,7 +127,11 @@ operator() (const int& rowIdx, const int& colIdx) const {
 }
 
 
+template<class T>
+RawMatrix<T>::
+RawMatrix(){
 
+}
 
 template<class T>
 RawMatrix<T>::
@@ -139,7 +145,8 @@ RawMatrix(const string& fileName){
         boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
 
         while(getline(fmgr.GetStream(), line, '\r')){
-            *pData = ProcessLine(*pData, line);
+            //keep incrementing the data container
+            ProcessLine(pData, line);
         }
 
         itsPRawMatrixData=pData;
@@ -150,6 +157,10 @@ RawMatrix(const string& fileName){
 
     }catch (string&   str){
         cout<<str<<endl;
+        exit(1);
+    }
+    catch(...){
+        cout<<"Exception occured"<<endl;
         exit(1);
     }
 }
@@ -164,7 +175,7 @@ RawMatrix(istream& ifstream){
         boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
 
         while(getline(ifstream, line, '\r')){
-            *pData = ProcessLine(*pData, line);
+            ProcessLine(pData, line);
         }
 
         itsPRawMatrixData=pData;
@@ -175,6 +186,27 @@ RawMatrix(istream& ifstream){
 
     }catch (string&   str){
         cout<<str<<endl;
+        exit(1);
+    }
+    catch(...){
+        cout<<"Exception occured"<<endl;
+        exit(1);
+    }
+}
+
+
+template<class T>
+RawMatrix<T>::
+RawMatrix(boost::shared_ptr<vector<vector<T>>> pData){
+    try{
+        itsPRawMatrixData = pData;
+        ValidateObject();
+    }catch(string& str){
+        cout <<str<<endl;
+        exit(1);
+    }
+    catch(...){
+        cout<<"Exception occured"<<endl;
         exit(1);
     }
 }
