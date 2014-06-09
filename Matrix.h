@@ -68,6 +68,7 @@ public:
     // Utils
     void ValidateObject() const;
     void SortByRowLabels(); // make 2 versions: in place and copy. Make  this into a normal function
+    void SwapRows(const int& r1, const int& r2);
 
     // Friends
     template<class S>
@@ -101,7 +102,24 @@ ValidateObject() const{
 }
 
 template<class T>
-Matrix<T> intersect(const Matrix<T>& mat, const strVec& labels);
+void Matrix<T>::
+SwapRows(const int& r1, const int& r2){
+
+    // swap raw data
+    itsRawData.SwapRows(r1, r2);
+
+    // swap row labels
+    string tmp = itsRowNames[r2];
+    itsRowNames[r2] = itsRowNames[r1];
+    itsRowNames[r1] = tmp;
+
+    ValidateObject();
+
+}
+
+template<class T>
+Matrix<T>
+intersect(const Matrix<T>& mat, const strVec& labels);
 
 
 template<class T>

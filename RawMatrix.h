@@ -45,6 +45,8 @@ public:
     template<class S>
     friend ostream& operator<< (ostream& str,  RawMatrix<S>& mat);
     void ValidateObject() const;
+    void SwapRows(const int& r1, const int& r2);
+    void SwapCols(const int& c1, const int& c2);
 
 private:
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
@@ -90,6 +92,29 @@ namespace{
     
 }
 
+template<class T>
+void RawMatrix<T>::
+SwapRows(const int& r1, const int& r2){
+    try{
+        size_t nRows = GetNrRows();
+        if(r1>=nRows || r2>=nRows){
+            throw (string("Bounds error: Cannot swap rows ")+to_string(r1)+string(" and ") + to_string(r2));
+        }
+
+        vector<T> tmp = (*itsPRawMatrixData)[r2];
+        (*itsPRawMatrixData)[r2] = (*itsPRawMatrixData)[r1];
+        (*itsPRawMatrixData)[r1] = tmp;
+
+        ValidateObject();
+    }
+    catch(string& err){
+        cout<<err<<endl;
+        exit(1);
+    }
+    catch(...){
+        cout<<"Unknown Error occured in "<<__FILE__<<"; Row "<<__LINE__<<endl;
+    }
+}
 
 template<class T>
 void RawMatrix<T>::
@@ -130,7 +155,7 @@ operator() (const int& rowIdx, const int& colIdx) const {
 template<class T>
 RawMatrix<T>::
 RawMatrix(){
-
+    // FIXME: Would be good to do validation but it will fail. Problem: I need this constructor elsewhere (do I?)
 }
 
 template<class T>

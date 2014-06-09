@@ -31,10 +31,9 @@ int main(int argc, const char * argv[])
     Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
     cout<<a<<endl;
 
-    a("abird", "secondCol") = 5.;
+
+    a.SwapRows(1, 3);
     cout<<a<<endl;
-
-
 
     return 0;
 }
