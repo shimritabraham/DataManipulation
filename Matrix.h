@@ -66,7 +66,7 @@ public:
           std::vector<T>& col(const std::string& name);
 
     // Utils
-    void ValidateObject() const;//e.g.: make sure its square.
+    void ValidateObject() const;
     void SortByRowLabels(); // make 2 versions: in place and copy. Make  this into a normal function
 
     // Friends
@@ -86,8 +86,19 @@ private:
 };
 
 
+template<class T>
+void Matrix<T>::
+ValidateObject() const{
 
+    // check the underlying raw data
+    itsRawData.ValidateObject();
 
+    // check that the labels have the right size
+    if(itsRawData.GetNrCols() != itsColNames.size())
+        throw string("Length of column labels does not match number of data columns");
+    if(itsRawData.GetNrRows() != itsRowNames.size())
+        throw string("Length of row labels does not match number of rows in data");
+}
 
 template<class T>
 Matrix<T> intersect(const Matrix<T>& mat, const strVec& labels);
@@ -98,6 +109,7 @@ Matrix<T>::
 Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
     itsRawData(rawData), itsRowNames(rowNames), itsColNames(colNames)
 {
+    ValidateObject();
 }
 
 template<class T>

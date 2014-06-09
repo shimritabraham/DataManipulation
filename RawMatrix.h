@@ -38,7 +38,7 @@ public:
     // Utils functions
     template<class S>
     friend ostream& operator<< (ostream& str,  RawMatrix<S>& mat);
-    bool Validate() const;
+    void ValidateObject() const;
 
 private:
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
@@ -48,8 +48,8 @@ private:
 
 
 template<class T>
-bool RawMatrix<T>::
-Validate() const{
+void RawMatrix<T>::
+ValidateObject() const{
 
     // check that there is at least one row
     size_t nRows = (*itsPRawMatrixData).size();
@@ -66,7 +66,6 @@ Validate() const{
         if((*itsPRawMatrixData)[i].size() != nCols)
             throw string("Columns are not of equal size");
     }
-    return true;
 }
 
 
@@ -128,7 +127,7 @@ RawMatrix(const string& fileName){
         itsPRawMatrixData=pData;
 
         // Check the integrity of the object
-        Validate();
+        ValidateObject();
 
 
     }catch (string&   str){
