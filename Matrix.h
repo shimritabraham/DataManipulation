@@ -69,6 +69,7 @@ public:
     void ValidateObject() const;
     void SortByRowLabels(); // make 2 versions: in place and copy. Make  this into a normal function
     void SwapRows(const int& r1, const int& r2);
+    void SwapCols(const int& c1, const int& c2);
 
     // Friends
     template<class S>
@@ -205,7 +206,34 @@ ostream& operator<< (ostream& str,  Matrix<S>& mat){
 
 }
 
+template<class T>
+const vector<T>& Matrix<T>::
+row(const int& idx) const{
+    return itsRawData.row(idx);
+}
 
+template<class T>
+vector<T>& Matrix<T>::
+row(const int& idx){
+    return itsRawData.row(idx);
+}
+
+template<class T>
+const std::vector<T>& Matrix<T>::
+row(const std::string& name) const{
+    strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
+    size_t idx = distance(itsRowNames.begin(), iElement);
+    return row(idx);
+}
+
+
+template<class T>
+std::vector<T>& Matrix<T>::
+row(const std::string& name){
+    strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
+    size_t idx = distance(itsRowNames.begin(), iElement);
+    return row((int) idx);
+}
 
 
 #endif

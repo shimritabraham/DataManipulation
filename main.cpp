@@ -32,8 +32,9 @@ int main(int argc, const char * argv[])
     cout<<a<<endl;
 
 
-    a.SwapRows(1, 3);
-    cout<<a<<endl;
+
+    auto r =a.row("e");
+
 
     return 0;
 }

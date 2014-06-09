@@ -35,6 +35,9 @@ public:
     size_t GetNrCols() const {return ((*itsPRawMatrixData)[0]).size();};
     size_t GetNrRows() const {return (*itsPRawMatrixData).size();};
 
+    const std::vector<T>& row(const int& idx) const;
+          std::vector<T>& row(const int& idx);
+
 
     // operators -- read/write
     const T& operator() (const int& rowIdx, const int& colIdx)const;
@@ -93,6 +96,19 @@ namespace{
 }
 
 template<class T>
+const vector<T>& RawMatrix<T>::
+row(const int& idx) const{
+    return (*itsPRawMatrixData)[idx];
+}
+
+
+template<class T>
+vector<T>& RawMatrix<T>::
+row(const int& idx){
+    return (*itsPRawMatrixData)[idx];
+}
+
+template<class T>
 void RawMatrix<T>::
 SwapRows(const int& r1, const int& r2){
     try{
@@ -115,6 +131,10 @@ SwapRows(const int& r1, const int& r2){
         cout<<"Unknown Error occured in "<<__FILE__<<"; Row "<<__LINE__<<endl;
     }
 }
+
+
+
+
 
 template<class T>
 void RawMatrix<T>::
