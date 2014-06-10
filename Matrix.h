@@ -60,10 +60,11 @@ public:
     const std::vector<T>& row(const std::string& name) const;
           std::vector<T>& row(const std::string& name);
 
-    const std::vector<T>& col(const int& idx) const;
-          std::vector<T>& col(const int& idx);
-    const std::vector<T>& col(const std::string& name) const;
-          std::vector<T>& col(const std::string& name);
+    //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
+    const std::vector<T> col(const int& idx) const;
+          std::vector<T> col(const int& idx);
+    const std::vector<T> col(const std::string& name) const;
+          std::vector<T> col(const std::string& name);
 
     // Utils
     void ValidateObject() const;
@@ -97,9 +98,11 @@ ValidateObject() const{
 
     // check that the labels have the right size
     if(itsRawData.GetNrCols() != itsColNames.size())
-        throw string("Length of column labels does not match number of data columns");
+        throw string("ERROR:\tLength of column labels does not match number of data columns")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     if(itsRawData.GetNrRows() != itsRowNames.size())
-        throw string("Length of row labels does not match number of rows in data");
+        throw string("ERROR:\tLength of row labels does not match number of rows in data")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
 }
 
 template<class T>
@@ -128,16 +131,8 @@ Matrix<T>::
 Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
     itsRawData(rawData), itsRowNames(rowNames), itsColNames(colNames)
 {
-    try{
-        ValidateObject();
-    }catch(string& str){
-        cout<<str<<endl;
-        exit(1);
-    }
-    catch(...){
-        cout<<"Exception occured"<<endl;
-        exit(1);
-    }
+    ValidateObject();
+
 }
 
 
@@ -146,15 +141,20 @@ const T& Matrix<T>::
 operator() (const std::string& rowName, const std::string& colName)const{
 
     // find mapping between string indices to location in the matrix
-    vector<string>::const_iterator rowIter = find(itsRowNames.begin(), itsRowNames.end(), rowName);
-    vector<string>::const_iterator colIter = find(itsColNames.begin(), itsColNames.end(), colName);
+    vector<string>::iterator rowIter = find(itsRowNames.begin(), itsRowNames.end(), rowName);
+    vector<string>::iterator colIter = find(itsColNames.begin(), itsColNames.end(), colName);
 
-    int i = distance(itsRowNames.begin(), rowIter);
-    int j = distance(itsColNames.begin(), colIter);
+    if(rowIter == itsRowNames.end() || colIter == itsColNames.end()){
+        throw string("ERROR:\tBoundary exceeded. \nElement ") + rowName +string(" and/or ")+colName +string(" cannot be found")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
 
     // find the element in the underlying raw data
+    int i = distance(itsRowNames.begin(), rowIter);
+    int j = distance(itsColNames.begin(), colIter);
     return itsRawData(i, j);
 }
+
 
 template<class T>
 T& Matrix<T>::
@@ -164,11 +164,15 @@ operator() (const std::string& rowName, const std::string& colName){
     vector<string>::iterator rowIter = find(itsRowNames.begin(), itsRowNames.end(), rowName);
     vector<string>::iterator colIter = find(itsColNames.begin(), itsColNames.end(), colName);
 
-    size_t i = distance(itsRowNames.begin(), rowIter);
-    size_t j = distance(itsColNames.begin(), colIter);
+    if(rowIter == itsRowNames.end() || colIter == itsColNames.end()){
+        throw string("ERROR:\tElement ") + rowName +string(" and/or ")+colName +string(" cannot be found")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
 
     // find the element in the underlying raw data
-    return itsRawData((int) i, (int) j);
+    size_t i = distance(itsRowNames.begin(), rowIter);
+    size_t j = distance(itsColNames.begin(), colIter);
+    return itsRawData((int)i, (int)j);
 
 }
 
@@ -221,9 +225,15 @@ row(const int& idx){
 template<class T>
 const std::vector<T>& Matrix<T>::
 row(const std::string& name) const{
-    strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
-    size_t idx = distance(itsRowNames.begin(), iElement);
-    return row(idx);
+
+        strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
+        if(iElement == itsRowNames.end()){
+            throw string("ERROR:\tUnable to find rowname ")+name+
+            string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+        }
+        size_t idx = distance(itsRowNames.begin(), iElement);
+        return row(idx);
+
 }
 
 
@@ -231,9 +241,59 @@ template<class T>
 std::vector<T>& Matrix<T>::
 row(const std::string& name){
     strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
+    if(iElement == itsRowNames.end()){
+        throw string("ERROR:\tUnable to find rowname ")+name+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
     size_t idx = distance(itsRowNames.begin(), iElement);
     return row((int) idx);
+
 }
+
+
+template<class T>
+std::vector<T> Matrix<T>::
+col(const int& idx) {
+    return itsRawData.col(idx);
+}
+
+template<class T>
+const std::vector<T> Matrix<T>::
+col(const int& idx) const {
+    return itsRawData.col(idx);
+}
+
+
+template<class T>
+vector<T> Matrix<T>::
+col(const std::string& name){
+
+    strVec::iterator iElement = find(itsColNames.begin(), itsColNames.end(), name);
+    if(iElement == itsColNames.end()){
+        throw string("ERROR:\tUnable to find a column named ")+name+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
+    size_t idx = distance(itsColNames.begin(), iElement);
+    //FIXME: change all these casts and use size_t consistently
+    return itsRawData.col((int) idx);
+
+}
+
+
+
+template<class T>
+const std::vector<T> Matrix<T>::
+col(const std::string& name)const{
+
+    strVec::iterator iElement = find(itsColNames.begin(), itsColNames.end(), name);
+    if(iElement == itsColNames.end()){
+        throw string("ERROR:\tUnable to find a column named ")+name+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
+    size_t idx = distance(itsColNames.begin(), iElement);
+    return itsRawData.col((int) idx);
+}
+
 
 
 #endif

@@ -35,8 +35,12 @@ public:
     size_t GetNrCols() const {return ((*itsPRawMatrixData)[0]).size();};
     size_t GetNrRows() const {return (*itsPRawMatrixData).size();};
 
-    const std::vector<T>& row(const int& idx) const;
-          std::vector<T>& row(const int& idx);
+    //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
+    const vector<T>& row(const int& idx) const;
+          vector<T>& row(const int& idx);
+    const vector<T> col(const int& idx) const;
+          vector<T> col(const int& idx);
+
 
 
     // operators -- read/write
@@ -80,7 +84,8 @@ namespace{
     void ProcessLine(boost::shared_ptr<vector<vector<T>>> result, string& line){
         // check type consistency of this line: either everything is numeric, or not and T is string
         if(!OnlyNumbers(line) && !std::is_same<T, string>::value)
-            throw string("Inconsistent data types found in file ");
+            throw string("ERROR:\tInconsistent data types found in file ")+
+            string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
 
         // process string to make it easily convertible to a vector
         line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end()); //get rid of white space
@@ -111,25 +116,17 @@ row(const int& idx){
 template<class T>
 void RawMatrix<T>::
 SwapRows(const int& r1, const int& r2){
-    try{
-        size_t nRows = GetNrRows();
-        if(r1>=nRows || r2>=nRows){
-            throw (string("Bounds error: Cannot swap rows ")+to_string(r1)+string(" and ") + to_string(r2));
-        }
+    size_t nRows = GetNrRows();
+    if(r1>=nRows || r2>=nRows){
+        throw (string("ERROR:\tCannot swap rows ")+to_string(r1)+string(" and ") + to_string(r2))+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
 
-        vector<T> tmp = (*itsPRawMatrixData)[r2];
-        (*itsPRawMatrixData)[r2] = (*itsPRawMatrixData)[r1];
-        (*itsPRawMatrixData)[r1] = tmp;
+    vector<T> tmp = (*itsPRawMatrixData)[r2];
+    (*itsPRawMatrixData)[r2] = (*itsPRawMatrixData)[r1];
+    (*itsPRawMatrixData)[r1] = tmp;
 
-        ValidateObject();
-    }
-    catch(string& err){
-        cout<<err<<endl;
-        exit(1);
-    }
-    catch(...){
-        cout<<"Unknown Error occured in "<<__FILE__<<"; Row "<<__LINE__<<endl;
-    }
+    ValidateObject();
 }
 
 
@@ -143,17 +140,20 @@ ValidateObject() const{
     // check that there is at least one row
     size_t nRows = (*itsPRawMatrixData).size();
     if(nRows == 0)
-        throw string("RawMatrix has zero rows");
+        throw string("ERROR:\tRawMatrix has zero rows")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
 
     // check that there is at least one column
     size_t nCols = (*itsPRawMatrixData)[0].size();
     if(nCols == 0)
-        throw string("RawMatrix has zero columns");
+        throw string("ERROR:\tRawMatrix has zero columns")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
 
     // check that all columns are of equal size
     for(size_t i = 0; i<nCols; i++){
         if((*itsPRawMatrixData)[i].size() != nCols)
-            throw string("Columns are not of equal size");
+            throw string("ERROR:\tColumns are not of equal size")+
+            string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     }
 }
 
@@ -175,85 +175,56 @@ operator() (const int& rowIdx, const int& colIdx) const {
 template<class T>
 RawMatrix<T>::
 RawMatrix(){
-    // FIXME: Would be good to do validation but it will fail. Problem: I need this constructor elsewhere (do I?)
+    // FIXME: Would be good to do validation but it will fail.
+    // Problem: I need this constructor elsewhere (do I really?)
 }
 
 template<class T>
 RawMatrix<T>::
 RawMatrix(const string& fileName){
 
-    try{
-        // Read the file line by line and store the data in a vector of vectors where each row is a vector
-        FileInputManager<T> fmgr(fileName);
-        fmgr.ValidateObject();
-        string line;
-        boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
+    // Read the file line by line and store the data in a vector of vectors where each row is a vector
+    FileInputManager<T> fmgr(fileName);
+    fmgr.ValidateObject();
+    string line;
+    boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
 
-        while(getline(fmgr.GetStream(), line, '\r')){
-            //keep incrementing the data container
-            ProcessLine(pData, line);
-        }
-
-        itsPRawMatrixData=pData;
-
-        // Check the integrity of the object
-        ValidateObject();
-
-
-    }catch (string&   str){
-        cout<<str<<endl;
-        exit(1);
+    while(getline(fmgr.GetStream(), line, '\r')){
+        //keep incrementing the data container
+        ProcessLine(pData, line);
     }
-    catch(...){
-        cout<<"Exception occured"<<endl;
-        exit(1);
-    }
+
+    itsPRawMatrixData=pData;
+
+    // Check the integrity of the object
+    ValidateObject();
+
 }
 
 template<class T>
 RawMatrix<T>::
 RawMatrix(istream& ifstream){
 
-    try{
-        // Read the file line by line and store the data in a vector of vectors where each row is a vector
-        string line;
-        boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
+    // Read the file line by line and store the data in a vector of vectors where each row is a vector
+    string line;
+    boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
 
-        while(getline(ifstream, line, '\r')){
-            ProcessLine(pData, line);
-        }
-
-        itsPRawMatrixData=pData;
-
-        // Check the integrity of the object
-        ValidateObject();
-
-
-    }catch (string&   str){
-        cout<<str<<endl;
-        exit(1);
+    while(getline(ifstream, line, '\r')){
+        ProcessLine(pData, line);
     }
-    catch(...){
-        cout<<"Exception occured"<<endl;
-        exit(1);
-    }
+
+    itsPRawMatrixData=pData;
+
+    // Check the integrity of the object
+    ValidateObject();
 }
 
 
 template<class T>
 RawMatrix<T>::
 RawMatrix(boost::shared_ptr<vector<vector<T>>> pData){
-    try{
-        itsPRawMatrixData = pData;
-        ValidateObject();
-    }catch(string& str){
-        cout <<str<<endl;
-        exit(1);
-    }
-    catch(...){
-        cout<<"Exception occured"<<endl;
-        exit(1);
-    }
+    itsPRawMatrixData = pData;
+    ValidateObject();
 }
 
 
@@ -273,5 +244,32 @@ ostream& operator<< (ostream& str,  RawMatrix<S>& mat){
     }
     return str;
 }
+
+
+template<class T>
+vector<T> RawMatrix<T>::
+col(const int& idx){
+    size_t nRows = GetNrRows();
+    vector<T> result;
+
+    for (int i=0; i<nRows; i++){
+        result.push_back((*itsPRawMatrixData)[i][idx]);
+    }
+    return result;
+}
+
+
+template<class T>
+const vector<T> RawMatrix<T>::
+col(const int& idx) const{
+    size_t nRows = GetNrRows();
+    vector<T> result;
+
+    for (int i=0; i<nRows; i++){
+        result.push_back((*itsPRawMatrixData)[i][idx]);
+    }
+    return result;
+}
+
 
 #endif

@@ -57,19 +57,11 @@ FileInputManager<T>::
 template<class T>
 void FileInputManager<T>::
 ValidateObject() const{
-    try{
-        if(!itsStream){
-            throw FileIOError("Unable to open file. ", itsFileName, __FILE__, __LINE__);
-        }
 
-    }catch(FileIOError& err){
-        err.PrintMessage();
-        exit(1);
+    if(!itsStream){
+        throw FileIOError("Unable to open file. ", itsFileName, __FILE__, __LINE__);
     }
-    catch(...){
-        cout<<"Exception occured"<<endl;
-        exit(1);
-    }
+
 }
 
 

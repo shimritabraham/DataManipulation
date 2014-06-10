@@ -9,7 +9,7 @@
 #include <iostream>
 #include "MatrixFactory.h"
 #include <ctype.h>
-
+#include "Utils.h"
 using namespace std;
 
 typedef vector<double> tdDoubleVec;
@@ -25,16 +25,20 @@ void foo(vector<int>* p){
 int main(int argc, const char * argv[])
 {
 
-    //params:
-    string fileName = "/Users/shimritabraham/Documents/work/data.csv";
+    try{
 
-    Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
-    cout<<a<<endl;
+        //params:
+        string fileName = "/Users/shimritabraham/Documents/work/data.csv";
+        Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
+        cout<<a<<endl;
+        auto r =a.col("secondCol");
+        cout<<r<<endl;
 
-
-
-    auto r =a.row("e");
-
+    }catch(string& err){
+        cout<<err<<endl;
+    }catch(...){
+        cout<<"Unexpected error occured"<<endl;
+    }
 
     return 0;
 }
