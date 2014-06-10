@@ -26,13 +26,23 @@ namespace MatrixFactory{
 
     template<class T>
     Matrix<T> CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
-    template<class T>
-    Matrix<T> CreateSimpleMatrixFromVectors(const vector< vector<T> >& vecvec);
 
-
+    // FIXME: Could add more 'create-functions' e.g. CreateSimpleMatrixFromVectors(), CreateSpeedyMatrix(), CreateSparseMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
 
+
 namespace {
+    // These functions are hidden, only used in this file
+
+
+    // Function declarations
+    template<class T>
+    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<T>>> pData, strVec& rowLabels, istream& fin);
+    vector<string> CreateDefaultLabels(const string& str, const size_t& len);
+    strVec ReadColLabels(istream& fin);
+
+
+    // Function definitions
     vector<string> CreateDefaultLabels(const string& str, const size_t& len){
         vector<string> result(len);
         for(size_t i =0; i<len; i++){
@@ -59,14 +69,13 @@ namespace {
         return colNames;
     }
 
+
     template<class T>
     void ReadFileWithRowNames(boost::shared_ptr<vector<vector<T>>> pData, strVec& rowLabels, istream& fin){
 
         string line;
         string rowName;
         while(getline(fin, line, '\r')){
-
-
             // process string to make it easily convertible to a vector
             line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end()); //get rid of white space
             replace(line.begin(), line.end(), ',', ' ');
@@ -78,19 +87,22 @@ namespace {
 
             // then add the rest of the data to result
             (*pData).push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
-
-
         }
     }
 
 }
 
 
-
-
-
 template<class T>
-Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
+Matrix<T> MatrixFactory::
+CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
+    // This is a simple matrix implementation that is not optimised for speed.
+
+    // Several cases are possible:
+    // 1. No row labels, no column labels are provided in the csv
+    // 2. Row labels and/or column labels are provided in the csv
+
+    // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
 
     strVec colNames;
     strVec rowNames;
@@ -98,7 +110,7 @@ Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName, const
 
     // simplest case: no labels present in file
     if(!hasColLabels && !hasRowLabels){
-        RawMatrix<T> rawData(fileName);
+        rawData = RawMatrix<T>(fileName);
         rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
         colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
 
@@ -112,8 +124,8 @@ Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName, const
     fmgr.ValidateObject();
     istream& fin = fmgr.GetStream();
 
+    // first read the col labels -- get it out of the way
     if(hasColLabels){
-        // first read the col labels
         colNames = ReadColLabels(fin);
     }
 
@@ -128,7 +140,7 @@ Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName, const
         rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
     }
 
-    // We can only now create default column labels, if needed
+    // Now that we know the dimensions of the data, we can create default column labels, if needed
     if(!hasColLabels)
         colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
 
@@ -137,7 +149,7 @@ Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName, const
     return Matrix<T>(rawData, rowNames, colNames);
 
 
-    //ASK: How do I avoid returning by value in this function?
+    //ASK: Can I avoid returning by value in this function?
 
 }
 

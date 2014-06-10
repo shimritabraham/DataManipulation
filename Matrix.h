@@ -23,17 +23,19 @@ typedef vector<string> strVec;
 
 template< class T>
 class Matrix{
-    // This should not be created directly by the user.
-    // Instead, please use the available MatrixFactly functions
+
+    // Please use the available MatrixFactly functions to create instances of this class
 
 public:
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Con/De structors ~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Note: Matrix objects should be created via Factory functions, not via the constructor
     Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames);
     ~Matrix(){}
+
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Member Functions ~~~~~~~~~~
@@ -55,14 +57,14 @@ public:
     const T& operator() (const std::string& rowName, const std::string& colName)const ;
           T& operator() (const std::string& rowName, const std::string& colName);
 
-    const std::vector<T>& row(const size_t& idx) const;
-          std::vector<T>& row(const size_t& idx);
+    const std::vector<T>& row(const size_t& idx) const  {return itsRawData.row(idx);}
+          std::vector<T>& row(const size_t& idx)        {return itsRawData.row(idx);}
     const std::vector<T>& row(const std::string& name) const;
           std::vector<T>& row(const std::string& name);
 
     //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
-    const std::vector<T> col(const size_t& idx) const;
-          std::vector<T> col(const size_t& idx);
+    const std::vector<T> col(const size_t& idx) const   {return itsRawData.col(idx);}
+          std::vector<T> col(const size_t& idx)         {return itsRawData.col(idx);}
     const std::vector<T> col(const std::string& name) const;
           std::vector<T> col(const std::string& name);
 
@@ -95,14 +97,17 @@ ValidateObject() const{
     // check the underlying raw data
     itsRawData.ValidateObject();
 
-    // check that the labels have the right size
+    // check that the column labels have the right size
     if(itsRawData.GetNrCols() != itsColNames.size())
         throw string("ERROR:\tLength of column labels does not match number of data columns")+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+
+    // check that the row labels have the right size
     if(itsRawData.GetNrRows() != itsRowNames.size())
         throw string("ERROR:\tLength of row labels does not match number of rows in data")+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
 }
+
 
 template<class T>
 void Matrix<T>::
@@ -117,12 +122,13 @@ SwapRows(const size_t& r1, const size_t& r2){
     itsRowNames[r1] = tmp;
 
     ValidateObject();
-
 }
+
 
 template<class T>
 void Matrix<T>::
 SwapCols(const size_t &c1, const size_t &c2){
+
     // swap raw data
     itsRawData.SwapCols(c1, c2);
 
@@ -133,11 +139,6 @@ SwapCols(const size_t &c1, const size_t &c2){
 
     ValidateObject();
 }
-
-
-template<class T>
-Matrix<T>
-intersect(const Matrix<T>& mat, const strVec& labels);
 
 
 template<class T>
@@ -187,9 +188,7 @@ operator() (const std::string& rowName, const std::string& colName){
     size_t i = distance(itsRowNames.begin(), rowIter);
     size_t j = distance(itsColNames.begin(), colIter);
     return itsRawData(i, j);
-
 }
-
 
 
 template<class S>
@@ -209,6 +208,7 @@ ostream& operator<< (ostream& str,  Matrix<S>& mat){
     }
     cout<<endl;
 
+    // print rownames and data row by row
     strVec rownames = mat.GetRowNames();
     for (size_t i=0; i<nRows; i++){
         cout<<setw(fieldWidth)<<rownames[i];
@@ -221,60 +221,38 @@ ostream& operator<< (ostream& str,  Matrix<S>& mat){
         str<<endl;
     }
     return str;
-
 }
 
-template<class T>
-const vector<T>& Matrix<T>::
-row(const size_t& idx) const{
-    return itsRawData.row(idx);
-}
-
-template<class T>
-vector<T>& Matrix<T>::
-row(const size_t& idx){
-    return itsRawData.row(idx);
-}
 
 template<class T>
 const std::vector<T>& Matrix<T>::
 row(const std::string& name) const{
 
-        strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
-        if(iElement == itsRowNames.end()){
-            throw string("ERROR:\tUnable to find rowname ")+name+
-            string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
-        }
-        size_t idx = distance(itsRowNames.begin(), iElement);
-        return row(idx);
+    // check input
+    strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
+    if(iElement == itsRowNames.end()){
+        throw string("ERROR:\tUnable to find rowname ")+name+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
 
+    size_t idx = distance(itsRowNames.begin(), iElement);
+    return row(idx);
 }
 
 
 template<class T>
 std::vector<T>& Matrix<T>::
 row(const std::string& name){
+
+    // check input
     strVec::iterator iElement = find(itsRowNames.begin(), itsRowNames.end(), name);
     if(iElement == itsRowNames.end()){
         throw string("ERROR:\tUnable to find rowname ")+name+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     }
+
     size_t idx = distance(itsRowNames.begin(), iElement);
     return row(idx);
-
-}
-
-
-template<class T>
-std::vector<T> Matrix<T>::
-col(const size_t& idx) {
-    return itsRawData.col(idx);
-}
-
-template<class T>
-const std::vector<T> Matrix<T>::
-col(const size_t& idx) const {
-    return itsRawData.col(idx);
 }
 
 
@@ -282,11 +260,13 @@ template<class T>
 vector<T> Matrix<T>::
 col(const std::string& name){
 
+    // check input
     strVec::iterator iElement = find(itsColNames.begin(), itsColNames.end(), name);
     if(iElement == itsColNames.end()){
         throw string("ERROR:\tUnable to find a column named ")+name+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     }
+
     size_t idx = distance(itsColNames.begin(), iElement);
     return itsRawData.col(idx);
 }
@@ -297,6 +277,7 @@ template<class T>
 const std::vector<T> Matrix<T>::
 col(const std::string& name)const{
 
+    // check input
     strVec::iterator iElement = find(itsColNames.begin(), itsColNames.end(), name);
     if(iElement == itsColNames.end()){
         throw string("ERROR:\tUnable to find a column named ")+name+

@@ -9,45 +9,42 @@
 #ifndef DataManipulation_RawMatrix_h
 #define DataManipulation_RawMatrix_h
 
-#include<type_traits>
-#include<string>
+#include <type_traits>
+#include <string>
 #include <boost/shared_ptr.hpp>
 #include "FileInputManager.h"
 #include "Utils.h"
+
 
 template<class T>
 class RawMatrix{
     // This should not be used directly by the user.
     // Instead, please create a Matrix object using the available MatrixFactory functions
 
-
     // FIXME: Initially, this class uses a vector of vectors to store matrix data. This can be enhanced to gain more speed later.
 
 public:
+
     // Con/Destructors
     RawMatrix(const string& fileName);
     RawMatrix(istream& ifstream);
-    RawMatrix(boost::shared_ptr<vector<vector<T>>> pData);
+    RawMatrix(boost::shared_ptr <vector<vector<T>>> pData);
     RawMatrix();
     ~RawMatrix(){};
-
 
     // accessors
     size_t GetNrCols() const {return ((*itsPRawMatrixData)[0]).size();};
     size_t GetNrRows() const {return (*itsPRawMatrixData).size();};
 
     //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
-    const vector<T>& row(const size_t& idx) const;
-          vector<T>& row(const size_t& idx);
+    const vector<T>& row(const size_t& idx) const {return (*itsPRawMatrixData)[idx];}
+          vector<T>& row(const size_t& idx)       {return (*itsPRawMatrixData)[idx];}
     const vector<T> col(const size_t& idx) const;
           vector<T> col(const size_t& idx);
-
-
 
     // operators -- read/write
     const T& operator() (const size_t& rowIdx, const size_t& colIdx)const;
     T& operator() (const size_t& rowIdx, const size_t& colIdx);
-
 
     // Utils functions
     template<class S>
@@ -57,6 +54,7 @@ public:
     void SwapCols(const size_t& c1, const size_t& c2);
 
 private:
+
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
 
 
@@ -66,6 +64,14 @@ private:
 namespace{
     // Helper functions which are not meant to be called directly
 
+    // Function declarations:
+
+    template<class T>
+    void ProcessLine(boost::shared_ptr<vector<vector<T>>> result, string& line);
+    bool OnlyNumbers(const string& str);
+
+
+    // Function definitions
 
     bool OnlyNumbers(const string& str){
         // Are all characters either numeric, a space or a dot?
@@ -78,7 +84,6 @@ namespace{
         }
         return (sumNums == str.size());
     }
-
 
 
     template<class T>
@@ -95,40 +100,30 @@ namespace{
 
         // add row of data to result
         (*result).push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
-        
     }
-
     
 }
 
-template<class T>
-const vector<T>& RawMatrix<T>::
-row(const size_t& idx) const{
-    return (*itsPRawMatrixData)[idx];
-}
-
-
-template<class T>
-vector<T>& RawMatrix<T>::
-row(const size_t& idx){
-    return (*itsPRawMatrixData)[idx];
-}
 
 template<class T>
 void RawMatrix<T>::
 SwapRows(const size_t& r1, const size_t& r2){
     size_t nRows = GetNrRows();
+
+    // check input
     if(r1>=nRows || r2>=nRows){
         throw (string("ERROR:\tCannot swap rows ")+to_string(r1)+string(" and ") + to_string(r2))+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     }
 
+    // swap rows
     vector<T> tmp = (*itsPRawMatrixData)[r2];
     (*itsPRawMatrixData)[r2] = (*itsPRawMatrixData)[r1];
     (*itsPRawMatrixData)[r1] = tmp;
 
     ValidateObject();
 }
+
 
 template<class T>
 void RawMatrix<T>::
@@ -148,10 +143,9 @@ SwapCols(const size_t &c1, const size_t &c2){
         (*itsPRawMatrixData)[i].at(c1) =(*itsPRawMatrixData)[i][c2];
         (*itsPRawMatrixData)[i].at(c2) = orgCol1[i];
     }
+
     ValidateObject();
 }
-
-
 
 
 template<class T>
@@ -179,12 +173,12 @@ ValidateObject() const{
 }
 
 
-
 template<class T>
 T& RawMatrix<T>::
 operator() (const size_t& rowIdx, const size_t& colIdx){
     return (*itsPRawMatrixData)[rowIdx][colIdx];
 }
+
 
 template<class T>
 const T& RawMatrix<T>::
@@ -200,11 +194,13 @@ RawMatrix(){
     // Problem: I need this constructor elsewhere (do I really?)
 }
 
+
 template<class T>
 RawMatrix<T>::
 RawMatrix(const string& fileName){
 
     // Read the file line by line and store the data in a vector of vectors where each row is a vector
+
     FileInputManager<T> fmgr(fileName);
     fmgr.ValidateObject();
     string line;
@@ -221,6 +217,7 @@ RawMatrix(const string& fileName){
     ValidateObject();
 
 }
+
 
 template<class T>
 RawMatrix<T>::
