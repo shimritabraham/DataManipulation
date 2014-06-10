@@ -13,6 +13,7 @@
 #include<string>
 #include <boost/shared_ptr.hpp>
 #include "FileInputManager.h"
+#include "Utils.h"
 
 template<class T>
 class RawMatrix{
@@ -129,6 +130,26 @@ SwapRows(const int& r1, const int& r2){
     ValidateObject();
 }
 
+template<class T>
+void RawMatrix<T>::
+SwapCols(const int &c1, const int &c2){
+
+    // check input
+    size_t nCols = GetNrCols();
+    if(c1>=nCols || c2>=nCols){
+        throw (string("ERROR:\tCannot swap cols ")+to_string(c1)+string(" and ") + to_string(c2))+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
+
+    // swap columns
+    vector<T> orgCol1 = col(c1);
+    size_t nRows = GetNrRows();
+    for (int i=0; i<nRows; i++){
+        (*itsPRawMatrixData)[i].at(c1) =(*itsPRawMatrixData)[i][c2];
+        (*itsPRawMatrixData)[i].at(c2) = orgCol1[i];
+    }
+    ValidateObject();
+}
 
 
 

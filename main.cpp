@@ -31,8 +31,8 @@ int main(int argc, const char * argv[])
         string fileName = "/Users/shimritabraham/Documents/work/data.csv";
         Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
         cout<<a<<endl;
-        auto r =a.col("secondCol");
-        cout<<r<<endl;
+        a.SwapCols(0, 1);
+        cout<<a<<endl;
 
     }catch(string& err){
         cout<<err<<endl;

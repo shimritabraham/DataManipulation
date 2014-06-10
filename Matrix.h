@@ -122,6 +122,21 @@ SwapRows(const int& r1, const int& r2){
 }
 
 template<class T>
+void Matrix<T>::
+SwapCols(const int &c1, const int &c2){
+    // swap raw data
+    itsRawData.SwapCols(c1, c2);
+
+    // swap col labels
+    string tmp = itsColNames[c2];
+    itsColNames[c2] = itsColNames[c1];
+    itsColNames[c1] = tmp;
+
+    ValidateObject();
+}
+
+
+template<class T>
 Matrix<T>
 intersect(const Matrix<T>& mat, const strVec& labels);
 
