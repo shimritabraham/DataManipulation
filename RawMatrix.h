@@ -21,7 +21,7 @@ class RawMatrix{
     // Instead, please create a Matrix object using the available MatrixFactory functions
 
 
-    // FIXME: Initially, this class uses a vector of vectors to store matrix data. This can be expanded to gain more speed later.
+    // FIXME: Initially, this class uses a vector of vectors to store matrix data. This can be enhanced to gain more speed later.
 
 public:
     // Con/Destructors
@@ -37,24 +37,24 @@ public:
     size_t GetNrRows() const {return (*itsPRawMatrixData).size();};
 
     //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
-    const vector<T>& row(const int& idx) const;
-          vector<T>& row(const int& idx);
-    const vector<T> col(const int& idx) const;
-          vector<T> col(const int& idx);
+    const vector<T>& row(const size_t& idx) const;
+          vector<T>& row(const size_t& idx);
+    const vector<T> col(const size_t& idx) const;
+          vector<T> col(const size_t& idx);
 
 
 
     // operators -- read/write
-    const T& operator() (const int& rowIdx, const int& colIdx)const;
-    T& operator() (const int& rowIdx, const int& colIdx);
+    const T& operator() (const size_t& rowIdx, const size_t& colIdx)const;
+    T& operator() (const size_t& rowIdx, const size_t& colIdx);
 
 
     // Utils functions
     template<class S>
     friend ostream& operator<< (ostream& str,  RawMatrix<S>& mat);
     void ValidateObject() const;
-    void SwapRows(const int& r1, const int& r2);
-    void SwapCols(const int& c1, const int& c2);
+    void SwapRows(const size_t& r1, const size_t& r2);
+    void SwapCols(const size_t& c1, const size_t& c2);
 
 private:
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
@@ -103,20 +103,20 @@ namespace{
 
 template<class T>
 const vector<T>& RawMatrix<T>::
-row(const int& idx) const{
+row(const size_t& idx) const{
     return (*itsPRawMatrixData)[idx];
 }
 
 
 template<class T>
 vector<T>& RawMatrix<T>::
-row(const int& idx){
+row(const size_t& idx){
     return (*itsPRawMatrixData)[idx];
 }
 
 template<class T>
 void RawMatrix<T>::
-SwapRows(const int& r1, const int& r2){
+SwapRows(const size_t& r1, const size_t& r2){
     size_t nRows = GetNrRows();
     if(r1>=nRows || r2>=nRows){
         throw (string("ERROR:\tCannot swap rows ")+to_string(r1)+string(" and ") + to_string(r2))+
@@ -132,7 +132,7 @@ SwapRows(const int& r1, const int& r2){
 
 template<class T>
 void RawMatrix<T>::
-SwapCols(const int &c1, const int &c2){
+SwapCols(const size_t &c1, const size_t &c2){
 
     // check input
     size_t nCols = GetNrCols();
@@ -144,7 +144,7 @@ SwapCols(const int &c1, const int &c2){
     // swap columns
     vector<T> orgCol1 = col(c1);
     size_t nRows = GetNrRows();
-    for (int i=0; i<nRows; i++){
+    for (size_t i=0; i<nRows; i++){
         (*itsPRawMatrixData)[i].at(c1) =(*itsPRawMatrixData)[i][c2];
         (*itsPRawMatrixData)[i].at(c2) = orgCol1[i];
     }
@@ -182,13 +182,13 @@ ValidateObject() const{
 
 template<class T>
 T& RawMatrix<T>::
-operator() (const int& rowIdx, const int& colIdx){
+operator() (const size_t& rowIdx, const size_t& colIdx){
     return (*itsPRawMatrixData)[rowIdx][colIdx];
 }
 
 template<class T>
 const T& RawMatrix<T>::
-operator() (const int& rowIdx, const int& colIdx) const {
+operator() (const size_t& rowIdx, const size_t& colIdx) const {
     return (*itsPRawMatrixData)[rowIdx][colIdx];
 }
 
@@ -196,7 +196,7 @@ operator() (const int& rowIdx, const int& colIdx) const {
 template<class T>
 RawMatrix<T>::
 RawMatrix(){
-    // FIXME: Would be good to do validation but it will fail.
+    // ASK: Would be good to do validation but it will fail.
     // Problem: I need this constructor elsewhere (do I really?)
 }
 
@@ -269,11 +269,11 @@ ostream& operator<< (ostream& str,  RawMatrix<S>& mat){
 
 template<class T>
 vector<T> RawMatrix<T>::
-col(const int& idx){
+col(const size_t& idx){
     size_t nRows = GetNrRows();
     vector<T> result;
 
-    for (int i=0; i<nRows; i++){
+    for (size_t i=0; i<nRows; i++){
         result.push_back((*itsPRawMatrixData)[i][idx]);
     }
     return result;
@@ -282,11 +282,11 @@ col(const int& idx){
 
 template<class T>
 const vector<T> RawMatrix<T>::
-col(const int& idx) const{
+col(const size_t& idx) const{
     size_t nRows = GetNrRows();
     vector<T> result;
 
-    for (int i=0; i<nRows; i++){
+    for (size_t i=0; i<nRows; i++){
         result.push_back((*itsPRawMatrixData)[i][idx]);
     }
     return result;

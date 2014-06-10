@@ -137,7 +137,7 @@ Matrix<T> MatrixFactory::CreateSimpleMatrixFromCsv(const string& fileName, const
     return Matrix<T>(rawData, rowNames, colNames);
 
 
-    //FIXME: How do I avoid returning by value in this function?
+    //ASK: How do I avoid returning by value in this function?
 
 }
 
