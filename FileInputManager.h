@@ -18,7 +18,6 @@
 
 using namespace std;
 
-template<class T>
 class FileInputManager{
 public:
     // Con/Destructors
@@ -38,15 +37,13 @@ private:
 
 };
 
-template<class T>
-FileInputManager<T>::
+FileInputManager::
 FileInputManager(const string& fileName): itsFileName(fileName), itsStream(fileName){
     ValidateObject();
 }
 
 
-template<class T>
-FileInputManager<T>::
+FileInputManager::
 ~FileInputManager(){
     if(itsStream.is_open()){
         itsStream.close();
@@ -54,8 +51,7 @@ FileInputManager<T>::
 }
 
 
-template<class T>
-void FileInputManager<T>::
+void FileInputManager::
 ValidateObject() const{
 
     if(!itsStream){
@@ -65,8 +61,7 @@ ValidateObject() const{
 }
 
 
-template<class T>
-bool FileInputManager<T>::
+bool FileInputManager::
 IsEOF(){
     return itsStream.eof();
 }

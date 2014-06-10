@@ -120,7 +120,7 @@ CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, cons
     }
 
     // Assuming there are row and/or col labels, we need a file handler
-    FileInputManager<T> fmgr(fileName);
+    FileInputManager fmgr(fileName);
     fmgr.ValidateObject();
     istream& fin = fmgr.GetStream();
 

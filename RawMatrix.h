@@ -201,7 +201,7 @@ RawMatrix(const string& fileName){
 
     // Read the file line by line and store the data in a vector of vectors where each row is a vector
 
-    FileInputManager<T> fmgr(fileName);
+    FileInputManager fmgr(fileName);
     fmgr.ValidateObject();
     string line;
     boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
