@@ -10,10 +10,10 @@
 #define __DataManipulation__FileInputManager__
 
 #include <iostream>
-#include<fstream>
-#include<sstream>
+#include <fstream>
+#include <sstream>
 #include <string>
-#include<vector>
+#include <vector>
 #include "FileIOError.h"
 
 using namespace std;
@@ -28,7 +28,6 @@ public:
     void ValidateObject() const;
     bool IsEOF();
     ifstream& GetStream(){return itsStream;}
-    
 
 private:
     // Data Members
@@ -36,37 +35,6 @@ private:
     ifstream itsStream;
 
 };
-
-FileInputManager::
-FileInputManager(const string& fileName): itsFileName(fileName), itsStream(fileName){
-    ValidateObject();
-}
-
-
-FileInputManager::
-~FileInputManager(){
-    if(itsStream.is_open()){
-        itsStream.close();
-    }
-}
-
-
-void FileInputManager::
-ValidateObject() const{
-
-    if(!itsStream){
-        throw FileIOError("Unable to open file. ", itsFileName, __FILE__, __LINE__);
-    }
-
-}
-
-
-bool FileInputManager::
-IsEOF(){
-    return itsStream.eof();
-}
-
-
 
 
 
