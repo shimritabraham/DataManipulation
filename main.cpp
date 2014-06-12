@@ -10,16 +10,8 @@
 #include "MatrixFactory.h"
 #include <ctype.h>
 #include "Utils.h"
+#include <algorithm>
 using namespace std;
-
-typedef vector<double> tdDoubleVec;
-
-
-
-void foo(vector<int>* p){
-    (*p).push_back(3);
-}
-
 
 
 int main(int argc, const char * argv[])
@@ -27,16 +19,25 @@ int main(int argc, const char * argv[])
 
     try{
 
-        //params:
-        string fileName = "/Users/shimritabraham/Documents/work/data.csv";
-        Matrix<double> a = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
-        cout<<a<<endl;
-        a.SwapCols(0, 1);
-        cout<<a<<endl;
+        //Data file source:
+        string fileName;
+        cout<<"Please provide a file name"<<endl;
+        getline(cin, fileName);
+//        fileName = "/Users/shimritabraham/Documents/work/USDRates_Mids.csv";
+
+
+        // Load csv into a Matrix object using a factory method
+        Matrix<double> mat = MatrixFactory::CreateSimpleMatrixFromCsv<double>(fileName, true, true);
+        cout<<mat<<endl;
+
+
 
     }catch(string& err){
         cout<<err<<endl;
-    }catch(...){
+    }catch(FileIOError& err){
+        err.PrintMessage();
+    }
+    catch(...){
         cout<<"Unexpected error occured"<<endl;
     }
 

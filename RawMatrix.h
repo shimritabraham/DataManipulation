@@ -28,7 +28,7 @@ public:
     // Con/Destructors
     RawMatrix(const string& fileName);
     RawMatrix(istream& ifstream);
-    RawMatrix(boost::shared_ptr <vector<vector<T>>> pData);
+    RawMatrix(const boost::shared_ptr <vector<vector<T>>>& pData);
     RawMatrix();
     ~RawMatrix(){};
 
@@ -54,7 +54,7 @@ public:
     void SwapCols(const size_t& c1, const size_t& c2);
 
 private:
-
+    //ASK: would it be better to make this a shared_ptr to a vector of shared_ptr's instead? To speed it up.
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
 
 
@@ -164,8 +164,8 @@ ValidateObject() const{
         throw string("ERROR:\tRawMatrix has zero columns")+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
 
-    // check that all columns are of equal size
-    for(size_t i = 0; i<nCols; i++){
+    // check that all rows are of equal size
+    for(size_t i = 0; i<nRows; i++){
         if((*itsPRawMatrixData)[i].size() != nCols)
             throw string("ERROR:\tColumns are not of equal size")+
             string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
@@ -206,7 +206,7 @@ RawMatrix(const string& fileName){
     string line;
     boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
 
-    while(getline(fmgr.GetStream(), line, '\r')){
+    while(getline(fmgr.GetStream(), line, '\n')){
         //keep incrementing the data container
         ProcessLine(pData, line);
     }
@@ -227,7 +227,7 @@ RawMatrix(istream& ifstream){
     string line;
     boost::shared_ptr<vector<vector<T>>> pData(new vector<vector<T>>);
 
-    while(getline(ifstream, line, '\r')){
+    while(getline(ifstream, line, '\n')){
         ProcessLine(pData, line);
     }
 
@@ -240,7 +240,7 @@ RawMatrix(istream& ifstream){
 
 template<class T>
 RawMatrix<T>::
-RawMatrix(boost::shared_ptr<vector<vector<T>>> pData){
+RawMatrix(const boost::shared_ptr<vector<vector<T>>>& pData){
     itsPRawMatrixData = pData;
     ValidateObject();
 }

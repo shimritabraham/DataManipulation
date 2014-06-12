@@ -15,6 +15,7 @@
 #include "RawMatrix.h"
 #include "FileInputManager.h"
 #include <boost/shared_ptr.hpp>
+#include "Utils.h"
 using namespace std;
 
 
@@ -54,10 +55,11 @@ namespace {
 
     strVec ReadColLabels(istream& fin){
         string line;
-        getline(fin, line, '\r');
+        getline(fin, line, '\n');
 
-        //get rid of white space
+        //get rid of white space and quotes
         line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
+        line.erase(remove( line.begin(), line.end(), '\"' ), line.end());
 
         // turn commas into spaces for easy conversion into vector
         replace(line.begin(), line.end(), ',', ' ');
@@ -65,7 +67,7 @@ namespace {
         // convert to vector
         stringstream in(line);
         strVec colNames = strVec(istream_iterator<string>(in), istream_iterator<string>());
-        
+
         return colNames;
     }
 
@@ -75,9 +77,13 @@ namespace {
 
         string line;
         string rowName;
-        while(getline(fin, line, '\r')){
+        while(getline(fin, line, '\n')){
             // process string to make it easily convertible to a vector
-            line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end()); //get rid of white space
+
+            //get rid of white space and quotes
+            line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
+            line.erase(remove( line.begin(), line.end(), '\"' ), line.end());
+
             replace(line.begin(), line.end(), ',', ' ');
             stringstream in(line);
 

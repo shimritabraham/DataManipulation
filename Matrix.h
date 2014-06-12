@@ -71,7 +71,9 @@ public:
     // Utils
     void ValidateObject() const;
     void SwapRows(const size_t& r1, const size_t& r2);
+    void SwapRows(const string& str1, const string& str2);
     void SwapCols(const size_t& c1, const size_t& c2);
+    void SwapCols(const string& str1, const string& str2);
 
     // Friends
     template<class S>
@@ -89,6 +91,105 @@ private:
     strVec itsColNames;
 };
 
+
+
+
+
+namespace{
+    // Helper functions that can only be called from this file
+
+    // Function Declarations
+    template<class S>
+    void PrintSmallMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth);
+    template<class S>
+    void PrintLargeMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols);
+
+
+    // Function Definitions
+    template<class S>
+    void PrintSmallMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth){
+        size_t nRows = mat.GetNrRows();
+        size_t nCols = mat.GetNrCols();
+
+        // print colnames
+        strVec colnames = mat.GetColNames();
+        cout<<setw(fieldWidth)<<right<<"";
+        for (size_t i=0; i<nCols; i++){
+            cout<<setw(fieldWidth)<<right<<colnames[i];
+        }
+        cout<<endl;
+
+        // print rownames and data row by row
+        strVec rownames = mat.GetRowNames();
+        for (size_t i=0; i<nRows; i++){
+            cout<<setw(fieldWidth)<<right<<rownames[i];
+            for (size_t j=0; j<nCols; j++){
+                str<<setw(fieldWidth)<<right<<mat(i, j);
+            }
+            str<<endl;
+        }
+        
+    }
+
+
+    template<class S>
+    void PrintLargeMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols){
+
+        size_t nRows = mat.GetNrRows();
+        size_t nCols = mat.GetNrCols();
+
+        // print colnames
+        strVec colnames = mat.GetColNames();
+        cout<<setw(fieldWidth)<<right<<"";
+        for (size_t i=0; i<maxCols/2; i++){
+            cout<<setw(fieldWidth)<<right<<colnames[i];
+        }
+        cout<<setw(fieldWidth)<<"...";
+        for (size_t i=nCols-maxCols/2-1; i<nCols; i++){
+            cout<<setw(fieldWidth)<<right<<colnames[i];
+        }
+        cout<<endl;
+
+
+        // print rownames and data row by row -- head
+        strVec rownames = mat.GetRowNames();
+        for (size_t i=0; i<maxRows/2; i++){
+            cout<<setw(fieldWidth)<<right<<rownames[i];
+            for (size_t j=0; j<maxCols/2; j++){
+                str<<setw(fieldWidth)<<right<<mat(i, j);
+            }
+            cout<<setw(fieldWidth)<<"...";
+            for (size_t j=nCols-maxCols/2-1; j<nCols; j++){
+                str<<setw(fieldWidth)<<right<<mat(i, j);
+            }
+
+            str<<endl;
+        }
+
+        cout<<"."<<endl;
+        cout<<"."<<endl;
+        cout<<"."<<endl;
+
+        // print rownames and data row by row -- head
+        for (size_t i=nRows-maxRows/2-1; i<nRows; i++){
+            cout<<setw(fieldWidth)<<right<<rownames[i];
+            for (size_t j=0; j<maxCols/2; j++){
+                str<<setw(fieldWidth)<<right<<mat(i, j);
+            }
+            cout<<setw(fieldWidth)<<"...";
+            for (size_t j=nCols-maxCols/2-1; j<nCols; j++){
+                str<<setw(fieldWidth)<<right<<mat(i, j);
+            }
+
+            str<<endl;
+        }
+
+
+
+    }
+
+
+}
 
 template<class T>
 void Matrix<T>::
@@ -122,6 +223,42 @@ SwapRows(const size_t& r1, const size_t& r2){
     itsRowNames[r1] = tmp;
 
     ValidateObject();
+}
+
+
+template<class T>
+void Matrix<T>::
+SwapRows(const string& str1, const string& str2){
+    vector<string>::iterator rowIter1 = find(itsRowNames.begin(), itsRowNames.end(), str1);
+    vector<string>::iterator rowIter2 = find(itsRowNames.begin(), itsRowNames.end(), str2);
+
+    if(rowIter1 == itsRowNames.end() || rowIter2 == itsRowNames.end()){
+        throw string("ERROR:\tBoundary exceeded. \nElement ") + str1 +string(" and/or ")+ str2 +string(" cannot be found")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
+
+    size_t r1 = distance(itsRowNames.begin(), rowIter1);
+    size_t r2 = distance(itsRowNames.begin(), rowIter2);
+
+    return SwapRows(r1, r2);
+}
+
+
+template<class T>
+void Matrix<T>::
+SwapCols(const string& str1, const string& str2){
+    vector<string>::iterator colIter1 = find(itsColNames.begin(), itsColNames.end(), str1);
+    vector<string>::iterator colIter2 = find(itsColNames.begin(), itsColNames.end(), str2);
+
+    if(colIter1 == itsColNames.end() || colIter2 == itsColNames.end()){
+        throw string("ERROR:\tBoundary exceeded. \nElement ") + str1 +string(" and/or ")+ str2 +string(" cannot be found")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
+
+    size_t c1 = distance(itsColNames.begin(), colIter1);
+    size_t c2 = distance(itsColNames.begin(), colIter2);
+
+    return SwapCols(c1, c2);
 }
 
 
@@ -191,35 +328,27 @@ operator() (const std::string& rowName, const std::string& colName){
 }
 
 
+
 template<class S>
 ostream& operator<< (ostream& str,  Matrix<S>& mat){
 
-    const int& fieldWidth = 15;
+    // ASK: Ideally, these parameters should live in some config file. How do I do this?
+    const int& fieldWidth = 20;
+    const int& maxCols = 4;
+    const int& maxRows = 10;
+    const int& precision = 8;
 
     size_t nRows = mat.GetNrRows();
     size_t nCols = mat.GetNrCols();
     str<<"Raw Data "<<"("<<nRows<<"x"<<nCols<<"):"<<endl<<endl;
 
-    // print colnames
-    strVec colnames = mat.GetColNames();
-    cout<<setw(fieldWidth)<<" ";
-    for (size_t i=0; i<nCols; i++){
-        cout<<setw(fieldWidth)<<colnames[i];
+    str<<setprecision(precision);
+    if(nRows<=maxRows && nCols<=maxCols){
+        PrintSmallMatrix(str, mat, fieldWidth);
+    }else{
+        PrintLargeMatrix(str, mat, fieldWidth, maxRows, maxCols);
     }
-    cout<<endl;
 
-    // print rownames and data row by row
-    strVec rownames = mat.GetRowNames();
-    for (size_t i=0; i<nRows; i++){
-        cout<<setw(fieldWidth)<<rownames[i];
-        for (size_t j=0; j<nCols; j++){
-            str<<setw(fieldWidth)<<mat(i, j);
-            // only print a comma if there's another number to print
-            if (j < nCols-1)
-                cout<<", ";
-        }
-        str<<endl;
-    }
     return str;
 }
 
