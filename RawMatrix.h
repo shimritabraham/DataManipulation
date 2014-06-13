@@ -11,7 +11,7 @@
 
 #include <type_traits>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp> //SYED: C++11 supports shared_ptr natively.
 #include "FileInputManager.h"
 #include "Utils.h"
 
@@ -22,6 +22,7 @@ class RawMatrix{
     // Instead, please create a Matrix object using the available MatrixFactory functions
 
     // FIXME: Initially, this class uses a vector of vectors to store matrix data. This can be enhanced to gain more speed later.
+	//SYED: Vector of vectors for simple types is dense memory and compilers/ processors do optimize them well. This can be kept. 
 
 public:
 
@@ -55,6 +56,7 @@ public:
 
 private:
     //ASK: would it be better to make this a shared_ptr to a vector of shared_ptr's instead? To speed it up.
+	//SYED: shared_ptr to vector<vector<T>> is fine. All data in vector<T> on heap.
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
 
 
@@ -76,7 +78,7 @@ namespace{
     bool OnlyNumbers(const string& str){
         // Are all characters either numeric, a space or a dot?
         // Helper function to read data and assert type consistency
-
+		//SYED: Yes, data will be either numeric/ space or dot.
         int sumNums = 0;
         for(size_t i = 0; i< str.size(); i++){
             if ((isnumber(str[i]) || isspace(str[i]) || str[i] == '.' || str[i] == ','))

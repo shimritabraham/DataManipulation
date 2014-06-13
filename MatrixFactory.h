@@ -29,6 +29,10 @@ namespace MatrixFactory{
     Matrix<T> CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
 
     // FIXME: Could add more 'create-functions' e.g. CreateSimpleMatrixFromVectors(), CreateSpeedyMatrix(), CreateSparseMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
+	//SYED: Provide one calling interface that just has an enumeration of matrices the code allows to create.
+	//SYED: enum MatrixType {DENSE, SPARSE, RAW, ETC}
+	//SYED: Your factory method can then look like Matrix<T> CreateSimpleMatrixFromCsv(const string& fileName, MatrixType mmType, bool hasColLabels = false, bool hasRowLabels =false);	
+
 }
 
 
@@ -102,6 +106,7 @@ namespace {
 template<class T>
 Matrix<T> MatrixFactory::
 CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
+	//SYED: Passing of simple types by reference is generally not required. Long strings sure but native types such as bools/ ints etc can be passed by value.
     // This is a simple matrix implementation that is not optimised for speed.
 
     // Several cases are possible:
@@ -109,6 +114,7 @@ CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, cons
     // 2. Row labels and/or column labels are provided in the csv
 
     // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
+	//SYED: Creation from CSV can be a slow process. Doing hdrive IO anyway so now worries.
 
     strVec colNames;
     strVec rowNames;
@@ -156,7 +162,8 @@ CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, cons
 
 
     //ASK: Can I avoid returning by value in this function?
-
+	//SYED: Creation can be via value. Unless CSV data gets huge in which case yes we would benefit allocating on heap and then passing a shared_ptr to calling code.
+	//SYED: Generally don't do disk io in realtime so these functions can be simple to read and implement.
 }
 
 
