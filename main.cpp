@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 sabraham. All rights reserved.
 //
 
-#include <iostream>
-#include "boost/date_time/local_time/local_time.hpp"
-#include "LMatrixFactory.h"
+//#include <iostream>
+//#include "boost/date_time/local_time/local_time.hpp"
+//#include "LMatrixFactory.h"
 
 // Tests
 #include <igloo/igloo.h>
@@ -18,9 +18,9 @@
 int main(int argc, const char * argv[])
 {
 
-    LMatrix<double, vector<string>, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, vector<string>, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
-    //vector<string>rNames = mat.GetRowLabels();
-    cout<<mat<<endl;
+//    LMatrix<double, vector<string>, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, vector<string>, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
+//    //vector<string>rNames = mat.GetRowLabels();
+//    cout<<mat<<endl;
 
 
 //    boost::posix_time::ptime dt(boost::posix_time::not_a_date_time);
@@ -32,6 +32,7 @@ int main(int argc, const char * argv[])
 //    ss >> dt;
 //    std::cout << dt << std::endl;
 
-//    return igloo::TestRunner::RunAllTests();
+    return 0;
+    //return igloo::TestRunner::RunAllTests();
 }
 

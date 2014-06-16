@@ -9,16 +9,26 @@
 #ifndef DataManipulation_Tests_Matrix_h
 #define DataManipulation_Tests_Matrix_h
 
+#include <iostream>
+#include "LMatrixFactory.h"
+
 #include <igloo/igloo.h>
 
 
 using namespace igloo;
 
-Context(SomeTest){
-    Spec(FirstTest){
-        int a = 3;
-        Assert::That(a, Equals(3));
-    }
+Context(CreateMatrix){
+
+    // ASK: Unable to find out how to provide a relative path, so using abs path instead
+    LMatrix<double, vector<string>, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, vector<string>, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
+
+    // FIXME:
+    // - Check that you can load a LMatrix from a file with/without row/column labels
+    // - Test cout
+    // etc... 
+
+
+
 };
 
 
