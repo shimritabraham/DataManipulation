@@ -1,13 +1,13 @@
 //
-//  Matrix.h
+//  LMatrix.h
 //  DataManipulation
 //
 //  Created by Shimrit Abraham on 05/06/2014.
 //  Copyright (c) 2014 sabraham. All rights reserved.
 //
 
-#ifndef DataManipulation_Matrix_h
-#define DataManipulation_Matrix_h
+#ifndef DataManipulation_LMatrix_h
+#define DataManipulation_LMatrix_h
 
 #include <vector>
 #include <string>
@@ -22,9 +22,9 @@ using namespace std;
 typedef vector<string> strVec;
 
 template< class T>
-class Matrix{
+class LMatrix{
 
-    // Please use the available MatrixFactly functions to create instances of this class
+    // Please use the available LMatrixFactly functions to create instances of this class
 
 public:
 
@@ -32,9 +32,9 @@ public:
     // ~~~~~~~~~~ Con/De structors ~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // Note: Matrix objects should be created via Factory functions, not via the constructor
-    Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames);
-    ~Matrix(){}
+    // Note: LMatrix objects should be created via Factory functions, not via the constructor
+    LMatrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames);
+    ~LMatrix(){}
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,7 +77,7 @@ public:
 
     // Friends
     template<class S>
-    friend ostream& operator<< (ostream& str,  Matrix<S>& mat);
+    friend ostream& operator<< (ostream& str,  LMatrix<S>& mat);
 
 
 private:
@@ -100,14 +100,14 @@ namespace{
 
     // Function Declarations
     template<class S>
-    void PrintSmallMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth);
+    void PrintSmallLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth);
     template<class S>
-    void PrintLargeMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols);
+    void PrintLargeLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols);
 
 
     // Function Definitions
     template<class S>
-    void PrintSmallMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth){
+    void PrintSmallLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth){
         size_t nRows = mat.GetNrRows();
         size_t nCols = mat.GetNrCols();
 
@@ -133,7 +133,7 @@ namespace{
 
 
     template<class S>
-    void PrintLargeMatrix(ostream& str, Matrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols){
+    void PrintLargeLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols){
 
         size_t nRows = mat.GetNrRows();
         size_t nCols = mat.GetNrCols();
@@ -188,7 +188,7 @@ namespace{
 
 
 template<class T>
-void Matrix<T>::
+void LMatrix<T>::
 ValidateObject() const{
 
     // check the underlying raw data
@@ -207,7 +207,7 @@ ValidateObject() const{
 
 
 template<class T>
-void Matrix<T>::
+void LMatrix<T>::
 SwapRows(const size_t& r1, const size_t& r2){
 
     // swap raw data
@@ -223,7 +223,7 @@ SwapRows(const size_t& r1, const size_t& r2){
 
 
 template<class T>
-void Matrix<T>::
+void LMatrix<T>::
 SwapRows(const string& str1, const string& str2){
     vector<string>::iterator rowIter1 = find(itsRowNames.begin(), itsRowNames.end(), str1);
     vector<string>::iterator rowIter2 = find(itsRowNames.begin(), itsRowNames.end(), str2);
@@ -241,7 +241,7 @@ SwapRows(const string& str1, const string& str2){
 
 
 template<class T>
-void Matrix<T>::
+void LMatrix<T>::
 SwapCols(const string& str1, const string& str2){
     vector<string>::iterator colIter1 = find(itsColNames.begin(), itsColNames.end(), str1);
     vector<string>::iterator colIter2 = find(itsColNames.begin(), itsColNames.end(), str2);
@@ -259,7 +259,7 @@ SwapCols(const string& str1, const string& str2){
 
 
 template<class T>
-void Matrix<T>::
+void LMatrix<T>::
 SwapCols(const size_t &c1, const size_t &c2){
 
     // swap raw data
@@ -275,8 +275,8 @@ SwapCols(const size_t &c1, const size_t &c2){
 
 
 template<class T>
-Matrix<T>::
-Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
+LMatrix<T>::
+LMatrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
     itsRawData(rawData), itsRowNames(rowNames), itsColNames(colNames)
 {
     ValidateObject();
@@ -285,7 +285,7 @@ Matrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
 
 
 template<class T>
-const T& Matrix<T>::
+const T& LMatrix<T>::
 operator() (const std::string& rowName, const std::string& colName)const{
 
     // find mapping between string indices to location in the matrix
@@ -305,7 +305,7 @@ operator() (const std::string& rowName, const std::string& colName)const{
 
 
 template<class T>
-T& Matrix<T>::
+T& LMatrix<T>::
 operator() (const std::string& rowName, const std::string& colName){
 
     // find mapping between string indices to location in the matrix
@@ -326,7 +326,7 @@ operator() (const std::string& rowName, const std::string& colName){
 
 
 template<class S>
-ostream& operator<< (ostream& str,  Matrix<S>& mat){
+ostream& operator<< (ostream& str,  LMatrix<S>& mat){
 
     // ASK: Ideally, these parameters should live in some config file. How do I do this?
     const int& fieldWidth = 20;
@@ -340,9 +340,9 @@ ostream& operator<< (ostream& str,  Matrix<S>& mat){
 
     str<<setprecision(precision);
     if(nRows<=maxRows && nCols<=maxCols){
-        PrintSmallMatrix(str, mat, fieldWidth);
+        PrintSmallLMatrix(str, mat, fieldWidth);
     }else{
-        PrintLargeMatrix(str, mat, fieldWidth, maxRows, maxCols);
+        PrintLargeLMatrix(str, mat, fieldWidth, maxRows, maxCols);
     }
 
     return str;
@@ -350,7 +350,7 @@ ostream& operator<< (ostream& str,  Matrix<S>& mat){
 
 
 template<class T>
-const std::vector<T>& Matrix<T>::
+const std::vector<T>& LMatrix<T>::
 row(const std::string& name) const{
 
     // check input
@@ -366,7 +366,7 @@ row(const std::string& name) const{
 
 
 template<class T>
-std::vector<T>& Matrix<T>::
+std::vector<T>& LMatrix<T>::
 row(const std::string& name){
 
     // check input
@@ -382,7 +382,7 @@ row(const std::string& name){
 
 
 template<class T>
-vector<T> Matrix<T>::
+vector<T> LMatrix<T>::
 col(const std::string& name){
 
     // check input
@@ -399,7 +399,7 @@ col(const std::string& name){
 
 
 template<class T>
-const std::vector<T> Matrix<T>::
+const std::vector<T> LMatrix<T>::
 col(const std::string& name)const{
 
     // check input

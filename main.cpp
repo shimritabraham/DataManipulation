@@ -8,32 +8,24 @@
 
 #include <iostream>
 #include "boost/date_time/local_time/local_time.hpp"
-//#include "MatrixFactory.h"
+#include "LMatrixFactory.h"
 
 int main(int argc, const char * argv[])
 {
 
-//    Matrix<double> mat = MatrixFactory::CreateSimpleMatrixFromCsv<double>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
-//    vector<string>rNames = mat.GetRowNames();
+    LMatrix<double> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
+    vector<string>rNames = mat.GetRowNames();
+    cout<<mat<<endl;
 
 
-    boost::posix_time::ptime dt(boost::posix_time::not_a_date_time);
-
-    std::stringstream ss;
-    ss.exceptions(std::ios_base::failbit);
-
-    // input date-time
-//    boost::local_time::local_time_input_facet* lif1(new boost::local_time::local_time_input_facet("%a, %d %b %Y %H:%M:%S GMT"));
+//    boost::posix_time::ptime dt(boost::posix_time::not_a_date_time);
+//    std::stringstream ss;
+//    ss.exceptions(std::ios_base::failbit);
+//    boost::local_time::local_time_input_facet* lif1(new boost::local_time::local_time_input_facet("%Y-%m-%dT%H:%M:%S%F%Q"));
 //    ss.imbue(std::locale(std::locale::classic(), lif1));
-//    ss.str("Sun, 06 Nov 1994 08:49:37 GMT");
-
-    boost::local_time::local_time_input_facet* lif1(new boost::local_time::local_time_input_facet("%Y-%m-%dT%H:%M:%S%F%Q"));
-    ss.imbue(std::locale(std::locale::classic(), lif1));
-    ss.str("2014-03-25T06:22:00.000");
-
-
-    ss >> dt;
-    std::cout << dt << std::endl;
+//    ss.str("2014-03-25T06:22:00.000");
+//    ss >> dt;
+//    std::cout << dt << std::endl;
 
     return 0;
 }

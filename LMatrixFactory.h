@@ -1,17 +1,17 @@
 //
-//  MatrixFactory.h
+//  LMatrixFactory.h
 //  DataManipulation
 //
 //  Created by Shimrit Abraham on 06/06/2014.
 //  Copyright (c) 2014 sabraham. All rights reserved.
 //
 
-#ifndef DataManipulation_MatrixFactory_h
-#define DataManipulation_MatrixFactory_h
+#ifndef DataManipulation_LMatrixFactory_h
+#define DataManipulation_LMatrixFactory_h
 
 #include <algorithm>
 #include <cctype>
-#include "Matrix.h"
+#include "LMatrix.h"
 #include "RawMatrix.h"
 #include "FileInputManager.h"
 #include <boost/shared_ptr.hpp>
@@ -20,15 +20,15 @@ using namespace std;
 
 
 
-namespace MatrixFactory{
+namespace LMatrixFactory{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Factory function declarations
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     template<class T>
-    Matrix<T> CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
+    LMatrix<T> CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
 
-    // FIXME: Could add more 'create-functions' e.g. CreateSimpleMatrixFromVectors(), CreateSpeedyMatrix(), CreateSparseMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
+    // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
 
 
@@ -100,9 +100,9 @@ namespace {
 
 
 template<class T>
-Matrix<T> MatrixFactory::
-CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
-    // This is a simple matrix implementation that is not optimised for speed.
+LMatrix<T> LMatrixFactory::
+CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
+    // This is a simple labelled matrix implementation that is not optimised for speed.
 
     // Several cases are possible:
     // 1. No row labels, no column labels are provided in the csv
@@ -121,7 +121,7 @@ CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, cons
         colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
 
         // Call constructor (Validation is done inside constructor)
-        return Matrix<T>(rawData, rowNames, colNames);
+        return LMatrix<T>(rawData, rowNames, colNames);
 
     }
 
@@ -151,8 +151,8 @@ CreateSimpleMatrixFromCsv(const string& fileName, const bool& hasColLabels, cons
         colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
 
 
-    // Finally, call the Matrix constructor (Validation is done inside constructor)
-    return Matrix<T>(rawData, rowNames, colNames);
+    // Finally, call the LMatrix constructor (Validation is done inside constructor)
+    return LMatrix<T>(rawData, rowNames, colNames);
 
 
     //ASK: Can I avoid returning by value in this function?
