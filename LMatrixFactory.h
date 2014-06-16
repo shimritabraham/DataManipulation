@@ -25,8 +25,8 @@ namespace LMatrixFactory{
     // Factory function declarations
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    template<class dataType>
-    LMatrix<dataType> CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
+    template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+    LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
 
     // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
@@ -37,10 +37,15 @@ namespace {
 
 
     // Function declarations
-    template<class dataType>
-    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, strVec& rowLabels, istream& fin);
+    template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin);
+
     vector<string> CreateDefaultLabels(const string& str, const size_t& len);
+
     strVec ReadColLabels(istream& fin);
+
+
+
 
 
     // Function definitions
@@ -72,11 +77,12 @@ namespace {
     }
 
 
-    template<class dataType>
-    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, strVec& rowLabels, istream& fin){
+
+    template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin){
 
         string line;
-        string rowName;
+        rowLabelElementType rowName;
         while(getline(fin, line, '\n')){
             // process string to make it easily convertible to a vector
 
@@ -99,8 +105,8 @@ namespace {
 }
 
 
-template<class dataType>
-LMatrix<dataType> LMatrixFactory::
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrixFactory::
 CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
     // This is a simple labelled matrix implementation that is not optimised for speed.
 
@@ -111,7 +117,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
     // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
 
     strVec colNames;
-    strVec rowNames;
+    rowLabelCollectionType rowNames;
     RawMatrix<dataType> rawData;
 
     // simplest case: no labels present in file
@@ -121,8 +127,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
         colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
 
         // Call constructor (Validation is done inside constructor)
-        return LMatrix<dataType>(rawData, rowNames, colNames);
-
+        return LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>(rawData, rowNames, colNames);
     }
 
     // Assuming there are row and/or col labels, we need a file handler
@@ -138,7 +143,9 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
     if(hasRowLabels){
         // read data and row labels from file
         boost::shared_ptr<vector<vector<dataType>>> pData(new(vector<vector<dataType>>));
-        ReadFileWithRowNames(pData, rowNames, fin);
+        ReadFileWithRowNames<dataType, rowLabelCollectionType, rowLabelElementType>(pData, rowNames, fin);
+
+
         rawData = RawMatrix<dataType>(pData);
     }else{
         // read only the data from file, activate default row labels
@@ -152,7 +159,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
 
     // Finally, call the LMatrix constructor (Validation is done inside constructor)
-    return LMatrix<dataType>(rawData, rowNames, colNames);
+    return LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>(rawData, rowNames, colNames);
 
 
     //ASK: Can I avoid returning by value in this function?

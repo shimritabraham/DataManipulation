@@ -10,11 +10,16 @@
 #include "boost/date_time/local_time/local_time.hpp"
 #include "LMatrixFactory.h"
 
+// Tests
+#include <igloo/igloo.h>
+#include "Tests_Matrix.h"
+
+
 int main(int argc, const char * argv[])
 {
 
-    LMatrix<double> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
-    vector<string>rNames = mat.GetRowNames();
+    LMatrix<double, vector<string>, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, vector<string>, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
+    //vector<string>rNames = mat.GetRowLabels();
     cout<<mat<<endl;
 
 
@@ -27,6 +32,6 @@ int main(int argc, const char * argv[])
 //    ss >> dt;
 //    std::cout << dt << std::endl;
 
-    return 0;
+//    return igloo::TestRunner::RunAllTests();
 }
 
