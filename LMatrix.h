@@ -21,7 +21,7 @@ using namespace std;
 
 typedef vector<string> strVec;
 
-template< class T>
+template< class dataType>
 class LMatrix{
 
     // Please use the available LMatrixFactly functions to create instances of this class
@@ -33,7 +33,7 @@ public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Note: LMatrix objects should be created via Factory functions, not via the constructor
-    LMatrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames);
+    LMatrix(RawMatrix<dataType>& rawData, strVec& rowNames, strVec& colNames);
     ~LMatrix(){}
 
 
@@ -42,7 +42,7 @@ public:
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // accessors
-    RawMatrix<T> GetRawData(){  return itsRawData;}
+    RawMatrix<dataType> GetRawData(){  return itsRawData;}
     size_t GetNrCols()   const {return itsRawData.GetNrCols();}
     size_t GetNrRows()   const {return itsRawData.GetNrRows();}
     strVec GetColNames() const{return itsColNames;}
@@ -52,21 +52,21 @@ public:
     std::ostream& operator<< (std::ostream& out);
 
     // operators -- read/write
-    const T& operator() (const size_t& rowIdx, const size_t& colIdx)const {return itsRawData(rowIdx, colIdx);};
-          T& operator() (const size_t& rowIdx, const size_t& colIdx)      {return itsRawData(rowIdx, colIdx);};
-    const T& operator() (const std::string& rowName, const std::string& colName)const ;
-          T& operator() (const std::string& rowName, const std::string& colName);
+    const dataType& operator() (const size_t& rowIdx, const size_t& colIdx)const {return itsRawData(rowIdx, colIdx);};
+          dataType& operator() (const size_t& rowIdx, const size_t& colIdx)      {return itsRawData(rowIdx, colIdx);};
+    const dataType& operator() (const std::string& rowName, const std::string& colName)const ;
+          dataType& operator() (const std::string& rowName, const std::string& colName);
 
-    const std::vector<T>& row(const size_t& idx) const  {return itsRawData.row(idx);}
-          std::vector<T>& row(const size_t& idx)        {return itsRawData.row(idx);}
-    const std::vector<T>& row(const std::string& name) const;
-          std::vector<T>& row(const std::string& name);
+    const std::vector<dataType>& row(const size_t& idx) const  {return itsRawData.row(idx);}
+          std::vector<dataType>& row(const size_t& idx)        {return itsRawData.row(idx);}
+    const std::vector<dataType>& row(const std::string& name) const;
+          std::vector<dataType>& row(const std::string& name);
 
     //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
-    const std::vector<T> col(const size_t& idx) const   {return itsRawData.col(idx);}
-          std::vector<T> col(const size_t& idx)         {return itsRawData.col(idx);}
-    const std::vector<T> col(const std::string& name) const;
-          std::vector<T> col(const std::string& name);
+    const std::vector<dataType> col(const size_t& idx) const   {return itsRawData.col(idx);}
+          std::vector<dataType> col(const size_t& idx)         {return itsRawData.col(idx);}
+    const std::vector<dataType> col(const std::string& name) const;
+          std::vector<dataType> col(const std::string& name);
 
     // Utils
     void ValidateObject() const;
@@ -86,7 +86,7 @@ private:
     // ~~~~~~~~~~ Data Members ~~~~~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    RawMatrix<T> itsRawData;  // this can potentially be templetized later
+    RawMatrix<dataType> itsRawData;  // this can potentially be templetized later
     strVec itsRowNames;
     strVec itsColNames;
 };
@@ -99,15 +99,15 @@ namespace{
     // Helper functions that can only be called from this file
 
     // Function Declarations
-    template<class S>
-    void PrintSmallLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth);
-    template<class S>
-    void PrintLargeLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols);
+    template<class dataType>
+    void PrintSmallLMatrix(ostream& str, LMatrix<dataType> mat, const int& fieldWidth);
+    template<class dataType>
+    void PrintLargeLMatrix(ostream& str, LMatrix<dataType> mat, const int& fieldWidth, const int& maxRows, const int& maxCols);
 
 
     // Function Definitions
-    template<class S>
-    void PrintSmallLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth){
+    template<class dataType>
+    void PrintSmallLMatrix(ostream& str, LMatrix<dataType> mat, const int& fieldWidth){
         size_t nRows = mat.GetNrRows();
         size_t nCols = mat.GetNrCols();
 
@@ -132,8 +132,8 @@ namespace{
     }
 
 
-    template<class S>
-    void PrintLargeLMatrix(ostream& str, LMatrix<S> mat, const int& fieldWidth, const int& maxRows, const int& maxCols){
+    template<class dataType>
+    void PrintLargeLMatrix(ostream& str, LMatrix<dataType> mat, const int& fieldWidth, const int& maxRows, const int& maxCols){
 
         size_t nRows = mat.GetNrRows();
         size_t nCols = mat.GetNrCols();
@@ -187,8 +187,8 @@ namespace{
 }
 
 
-template<class T>
-void LMatrix<T>::
+template<class dataType>
+void LMatrix<dataType>::
 ValidateObject() const{
 
     // check the underlying raw data
@@ -206,8 +206,8 @@ ValidateObject() const{
 }
 
 
-template<class T>
-void LMatrix<T>::
+template<class dataType>
+void LMatrix<dataType>::
 SwapRows(const size_t& r1, const size_t& r2){
 
     // swap raw data
@@ -222,8 +222,8 @@ SwapRows(const size_t& r1, const size_t& r2){
 }
 
 
-template<class T>
-void LMatrix<T>::
+template<class dataType>
+void LMatrix<dataType>::
 SwapRows(const string& str1, const string& str2){
     vector<string>::iterator rowIter1 = find(itsRowNames.begin(), itsRowNames.end(), str1);
     vector<string>::iterator rowIter2 = find(itsRowNames.begin(), itsRowNames.end(), str2);
@@ -240,8 +240,8 @@ SwapRows(const string& str1, const string& str2){
 }
 
 
-template<class T>
-void LMatrix<T>::
+template<class dataType>
+void LMatrix<dataType>::
 SwapCols(const string& str1, const string& str2){
     vector<string>::iterator colIter1 = find(itsColNames.begin(), itsColNames.end(), str1);
     vector<string>::iterator colIter2 = find(itsColNames.begin(), itsColNames.end(), str2);
@@ -258,8 +258,8 @@ SwapCols(const string& str1, const string& str2){
 }
 
 
-template<class T>
-void LMatrix<T>::
+template<class dataType>
+void LMatrix<dataType>::
 SwapCols(const size_t &c1, const size_t &c2){
 
     // swap raw data
@@ -274,9 +274,9 @@ SwapCols(const size_t &c1, const size_t &c2){
 }
 
 
-template<class T>
-LMatrix<T>::
-LMatrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
+template<class dataType>
+LMatrix<dataType>::
+LMatrix(RawMatrix<dataType>& rawData, strVec& rowNames, strVec& colNames):
     itsRawData(rawData), itsRowNames(rowNames), itsColNames(colNames)
 {
     ValidateObject();
@@ -284,8 +284,8 @@ LMatrix(RawMatrix<T>& rawData, strVec& rowNames, strVec& colNames):
 }
 
 
-template<class T>
-const T& LMatrix<T>::
+template<class dataType>
+const dataType& LMatrix<dataType>::
 operator() (const std::string& rowName, const std::string& colName)const{
 
     // find mapping between string indices to location in the matrix
@@ -304,8 +304,8 @@ operator() (const std::string& rowName, const std::string& colName)const{
 }
 
 
-template<class T>
-T& LMatrix<T>::
+template<class dataType>
+dataType& LMatrix<dataType>::
 operator() (const std::string& rowName, const std::string& colName){
 
     // find mapping between string indices to location in the matrix
@@ -325,8 +325,8 @@ operator() (const std::string& rowName, const std::string& colName){
 
 
 
-template<class S>
-ostream& operator<< (ostream& str,  LMatrix<S>& mat){
+template<class dataType>
+ostream& operator<< (ostream& str,  LMatrix<dataType>& mat){
 
     // ASK: Ideally, these parameters should live in some config file. How do I do this?
     const int& fieldWidth = 20;
@@ -349,8 +349,8 @@ ostream& operator<< (ostream& str,  LMatrix<S>& mat){
 }
 
 
-template<class T>
-const std::vector<T>& LMatrix<T>::
+template<class dataType>
+const std::vector<dataType>& LMatrix<dataType>::
 row(const std::string& name) const{
 
     // check input
@@ -365,8 +365,8 @@ row(const std::string& name) const{
 }
 
 
-template<class T>
-std::vector<T>& LMatrix<T>::
+template<class dataType>
+std::vector<dataType>& LMatrix<dataType>::
 row(const std::string& name){
 
     // check input
@@ -381,8 +381,8 @@ row(const std::string& name){
 }
 
 
-template<class T>
-vector<T> LMatrix<T>::
+template<class dataType>
+vector<dataType> LMatrix<dataType>::
 col(const std::string& name){
 
     // check input
@@ -398,8 +398,8 @@ col(const std::string& name){
 
 
 
-template<class T>
-const std::vector<T> LMatrix<T>::
+template<class dataType>
+const std::vector<dataType> LMatrix<dataType>::
 col(const std::string& name)const{
 
     // check input

@@ -25,8 +25,8 @@ namespace LMatrixFactory{
     // Factory function declarations
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    template<class T>
-    LMatrix<T> CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
+    template<class dataType>
+    LMatrix<dataType> CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
 
     // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
@@ -37,8 +37,8 @@ namespace {
 
 
     // Function declarations
-    template<class T>
-    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<T>>> pData, strVec& rowLabels, istream& fin);
+    template<class dataType>
+    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, strVec& rowLabels, istream& fin);
     vector<string> CreateDefaultLabels(const string& str, const size_t& len);
     strVec ReadColLabels(istream& fin);
 
@@ -72,8 +72,8 @@ namespace {
     }
 
 
-    template<class T>
-    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<T>>> pData, strVec& rowLabels, istream& fin){
+    template<class dataType>
+    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, strVec& rowLabels, istream& fin){
 
         string line;
         string rowName;
@@ -92,15 +92,15 @@ namespace {
             rowLabels.push_back(rowName);
 
             // then add the rest of the data to result
-            (*pData).push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
+            (*pData).push_back(vector<dataType>(istream_iterator<dataType>(in), istream_iterator<dataType>()));
         }
     }
 
 }
 
 
-template<class T>
-LMatrix<T> LMatrixFactory::
+template<class dataType>
+LMatrix<dataType> LMatrixFactory::
 CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
     // This is a simple labelled matrix implementation that is not optimised for speed.
 
@@ -112,16 +112,16 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
     strVec colNames;
     strVec rowNames;
-    RawMatrix<T> rawData;
+    RawMatrix<dataType> rawData;
 
     // simplest case: no labels present in file
     if(!hasColLabels && !hasRowLabels){
-        rawData = RawMatrix<T>(fileName);
+        rawData = RawMatrix<dataType>(fileName);
         rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
         colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
 
         // Call constructor (Validation is done inside constructor)
-        return LMatrix<T>(rawData, rowNames, colNames);
+        return LMatrix<dataType>(rawData, rowNames, colNames);
 
     }
 
@@ -137,12 +137,12 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
     if(hasRowLabels){
         // read data and row labels from file
-        boost::shared_ptr<vector<vector<T>>> pData(new(vector<vector<T>>));
+        boost::shared_ptr<vector<vector<dataType>>> pData(new(vector<vector<dataType>>));
         ReadFileWithRowNames(pData, rowNames, fin);
-        rawData = RawMatrix<T>(pData);
+        rawData = RawMatrix<dataType>(pData);
     }else{
         // read only the data from file, activate default row labels
-        rawData = RawMatrix<T>(fin);
+        rawData = RawMatrix<dataType>(fin);
         rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
     }
 
@@ -152,7 +152,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
 
     // Finally, call the LMatrix constructor (Validation is done inside constructor)
-    return LMatrix<T>(rawData, rowNames, colNames);
+    return LMatrix<dataType>(rawData, rowNames, colNames);
 
 
     //ASK: Can I avoid returning by value in this function?
