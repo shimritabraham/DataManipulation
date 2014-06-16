@@ -151,7 +151,7 @@ namespace{
         cout<<endl;
 
 
-        // print rownames and data row by row -- head
+        // print the head of the matrix
         strVec rownames = mat.GetRowNames();
         for (size_t i=0; i<maxRows/2; i++){
             cout<<setw(fieldWidth)<<right<<rownames[i];
@@ -170,7 +170,7 @@ namespace{
         cout<<"."<<endl;
         cout<<"."<<endl;
 
-        // print rownames and data row by row -- head
+        // print the tail of the matrix
         for (size_t i=nRows-maxRows/2-1; i<nRows; i++){
             cout<<setw(fieldWidth)<<right<<rownames[i];
             for (size_t j=0; j<maxCols/2; j++){
@@ -180,16 +180,12 @@ namespace{
             for (size_t j=nCols-maxCols/2-1; j<nCols; j++){
                 str<<setw(fieldWidth)<<right<<mat(i, j);
             }
-
             str<<endl;
         }
 
-
-
     }
-
-
 }
+
 
 template<class T>
 void Matrix<T>::
