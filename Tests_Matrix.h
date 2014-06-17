@@ -25,7 +25,7 @@ Context(CreateMatrix){
     // FIXME:
     // - Check that you can load a LMatrix from a file with/without row/column labels
     // - Test cout
-    // etc... 
+    // etc...
 
 
 

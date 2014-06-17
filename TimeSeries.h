@@ -9,16 +9,47 @@
 #ifndef DataManipulation_TimeSeries_h
 #define DataManipulation_TimeSeries_h
 
-#include "RawMatrix.h"
+#include "LMatrix.h"
+typedef vector<string> strVec;
 
-
-template<class T>
-class TimeSeries:Matrix{
-    // a TimeSeries object is a special kind of Matrix where the rownames represent timestamps
+template<class dataType, class dtContainerType, class dtElementType>
+class TimeSeries: public LMatrix<dataType, dtContainerType, dtElementType>{
+    // a TimeSeries object is a special kind of Labelled Matrix where the rownames represent timestamps
 
 public:
-private:
+    TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames);
+    TimeSeries():LMatrix<dataType, dtContainerType, dtElementType>(){};
+    ~TimeSeries(){};
+
+
+    // Util functions:
+    void ValidateObject();
+    bool IsSorted();
+    bool IsUnique();
+    void Sort();
+
+    //FIXME: check if cout works
+
+
 };
+
+// Non-Member Functions:
+TimeSeries<class dataType, class dtContainerType, class dtElementType>
+LeftJoin(const TimeSeries<dataType, dtContainerType, dtElementType>& LHS_ts, const TimeSeries<dataType, dtContainerType, dtElementType>& RHS_ts);
+
+TimeSeries<class dataType, class dtContainerType, class dtElementType>
+Intersect(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const TimeSeries<dataType, dtContainerType, dtElementType>& ts2);
+
+TimeSeries<class dataType, class dtContainerType, class dtElementType>
+Union(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const TimeSeries<dataType, dtContainerType, dtElementType>& ts2);
+
+
+
+
+
+
+
+
 
 
 

@@ -34,7 +34,8 @@ public:
 
     // Note: LMatrix objects should be created via Factory functions, not via the constructor
     LMatrix(RawMatrix<dataType>& rawData, rowLabelCollectionType& rowNames, strVec& colNames);
-    ~LMatrix(){}
+    LMatrix();
+    ~LMatrix(){};
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +121,7 @@ namespace{
         cout<<endl;
 
         // print rownames and data row by row
-        strVec rownames = mat.GetRowLabels();
+        strVec rownames = mat.GetRowLabels().to_string();
         for (size_t i=0; i<nRows; i++){
             cout<<setw(fieldWidth)<<right<<rownames[i];
             for (size_t j=0; j<nCols; j++){
@@ -152,7 +153,7 @@ namespace{
 
 
         // print the head of the matrix
-        strVec rownames = mat.GetRowLabels();
+        strVec rownames = mat.GetRowLabels().to_string();
         for (size_t i=0; i<maxRows/2; i++){
             cout<<setw(fieldWidth)<<right<<rownames[i];
             for (size_t j=0; j<maxCols/2; j++){
@@ -184,6 +185,14 @@ namespace{
         }
 
     }
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+LMatrix(){
+    // FIXME: Would be good to do validation but it will fail.
+    // Problem: I need this constructor elsewhere (do I really?)
 }
 
 
@@ -225,16 +234,9 @@ SwapRows(const size_t& r1, const size_t& r2){
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 void LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 SwapRows(const rowLabelElementType& str1, const rowLabelElementType& str2){
-    typename rowLabelCollectionType::iterator rowIter1 = find(itsRowLabels.begin(), itsRowLabels.end(), str1);
-    typename rowLabelCollectionType::iterator rowIter2 = find(itsRowLabels.begin(), itsRowLabels.end(), str2);
 
-    if(rowIter1 == itsRowLabels.end() || rowIter2 == itsRowLabels.end()){
-        throw string("ERROR:\tBoundary exceeded. \nElement ") + str1 +string(" and/or ")+ str2 +string(" cannot be found")+
-        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
-    }
-
-    size_t r1 = distance(itsRowLabels.begin(), rowIter1);
-    size_t r2 = distance(itsRowLabels.begin(), rowIter2);
+    size_t r1 = itsRowLabels.find(str1);
+    size_t r2 = itsRowLabels.find(str2);
 
     return SwapRows(r1, r2);
 }
@@ -289,17 +291,16 @@ const dataType& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 operator() (const rowLabelElementType& rowName, const std::string& colName)const{
 
     // find mapping between string indices to location in the matrix
-    typename rowLabelCollectionType::iterator rowIter = find(itsRowLabels.begin(), itsRowLabels.end(), rowName);
     vector<string>::iterator colIter = find(itsColLabels.begin(), itsColLabels.end(), colName);
-
-    if(rowIter == itsRowLabels.end() || colIter == itsColLabels.end()){
-        throw string("ERROR:\tBoundary exceeded. \nElement ") + rowName +string(" and/or ")+colName +string(" cannot be found")+
+    if(colIter == itsColLabels.end()){
+        throw string("ERROR:\tBoundary exceeded. \nElement ") + colName +string(" cannot be found")+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     }
 
     // find the element in the underlying raw data
-    size_t i = distance(itsRowLabels.begin(), rowIter);
     size_t j = distance(itsColLabels.begin(), colIter);
+    size_t i = itsRowLabels.find(rowName);
+
     return itsRawData(i, j);
 }
 
@@ -308,19 +309,20 @@ template<class dataType, class rowLabelCollectionType, class rowLabelElementType
 dataType& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 operator() (const rowLabelElementType& rowName, const std::string& colName){
 
-    // find mapping between string indices to location in the matrix
-    typename rowLabelCollectionType::iterator rowIter = find(itsRowLabels.begin(), itsRowLabels.end(), rowName);
-    vector<string>::iterator colIter = find(itsColLabels.begin(), itsColLabels.end(), colName);
 
-    if(rowIter == itsRowLabels.end() || colIter == itsColLabels.end()){
-        throw string("ERROR:\tElement ") + rowName +string(" and/or ")+colName +string(" cannot be found")+
+    // find mapping between string indices to location in the matrix
+    vector<string>::iterator colIter = find(itsColLabels.begin(), itsColLabels.end(), colName);
+    if(colIter == itsColLabels.end()){
+        throw string("ERROR:\tBoundary exceeded. \nElement ") + colName +string(" cannot be found")+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     }
 
     // find the element in the underlying raw data
-    size_t i = distance(itsRowLabels.begin(), rowIter);
     size_t j = distance(itsColLabels.begin(), colIter);
+    size_t i = itsRowLabels.find(rowName);
+
     return itsRawData(i, j);
+
 }
 
 
@@ -352,15 +354,7 @@ ostream& operator<< (ostream& str,  LMatrix<dataType, rowLabelCollectionType, ro
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 const vector<dataType>& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 row(const rowLabelElementType& name) const{
-
-    // check input
-    typename rowLabelCollectionType::iterator iElement = find(itsRowLabels.begin(), itsRowLabels.end(), name);
-    if(iElement == itsRowLabels.end()){
-        throw string("ERROR:\tUnable to find rowname ")+name+
-        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
-    }
-
-    size_t idx = distance(itsRowLabels.begin(), iElement);
+    size_t idx = itsRowLabels.find(name);
     return row(idx);
 }
 
@@ -369,14 +363,7 @@ template<class dataType, class rowLabelCollectionType, class rowLabelElementType
 vector<dataType>& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 row(const rowLabelElementType& name){
 
-    // check input
-    typename rowLabelCollectionType::iterator iElement = find(itsRowLabels.begin(), itsRowLabels.end(), name);
-    if(iElement == itsRowLabels.end()){
-        throw string("ERROR:\tUnable to find rowname ")+name+
-        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
-    }
-
-    size_t idx = distance(itsRowLabels.begin(), iElement);
+    size_t idx = itsRowLabels.find(name);
     return row(idx);
 }
 

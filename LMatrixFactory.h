@@ -26,7 +26,8 @@ namespace LMatrixFactory{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-    LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
+    LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
+    CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
 
     // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
@@ -40,7 +41,7 @@ namespace {
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
     void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin);
 
-    vector<string> CreateDefaultLabels(const string& str, const size_t& len);
+    vector<string> CreateDefaultLabels(string& str, const size_t& len);
 
     strVec ReadColLabels(istream& fin);
 
@@ -49,7 +50,7 @@ namespace {
 
 
     // Function definitions
-    vector<string> CreateDefaultLabels(const string& str, const size_t& len){
+    vector<string> CreateDefaultLabels(string& str, const size_t& len){
         vector<string> result(len);
         for(size_t i =0; i<len; i++){
             result[i] = str+to_string(i);
@@ -119,12 +120,15 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
     strVec colNames;
     rowLabelCollectionType rowNames;
     RawMatrix<dataType> rawData;
+    string default_rowLabel_str = "row_";
+    string default_colLabel_str = "col_";
+
 
     // simplest case: no labels present in file
     if(!hasColLabels && !hasRowLabels){
         rawData = RawMatrix<dataType>(fileName);
-        rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
-        colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
+        rowNames = rowLabelCollectionType(CreateDefaultLabels(default_rowLabel_str, rawData.GetNrRows()));
+        colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
 
         // Call constructor (Validation is done inside constructor)
         return LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>(rawData, rowNames, colNames);
@@ -144,18 +148,16 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
         // read data and row labels from file
         boost::shared_ptr<vector<vector<dataType>>> pData(new(vector<vector<dataType>>));
         ReadFileWithRowNames<dataType, rowLabelCollectionType, rowLabelElementType>(pData, rowNames, fin);
-
-
         rawData = RawMatrix<dataType>(pData);
     }else{
         // read only the data from file, activate default row labels
         rawData = RawMatrix<dataType>(fin);
-        rowNames = CreateDefaultLabels("row_", rawData.GetNrRows());
+        rowNames.SetDefaultLabels(default_rowLabel_str, rawData.GetNrRows());
     }
 
     // Now that we know the dimensions of the data, we can create default column labels, if needed
     if(!hasColLabels)
-        colNames = CreateDefaultLabels("col_", rawData.GetNrCols());
+        colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
 
 
     // Finally, call the LMatrix constructor (Validation is done inside constructor)
