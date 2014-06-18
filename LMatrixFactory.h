@@ -111,7 +111,11 @@ LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrixFactory::
 CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
     // This is a simple labelled matrix implementation that is not optimised for speed.
 
-    // Several cases are possible:
+    // PARAMETERS:
+    // dataType: type of elements that the LMatrix will hold. Can be any class/type
+    // rowLabelCollectionType: any container that respects a minimum set of interface requirements, see the StringLabels or DateTimeLabels classes
+    // rowLabelElementType: has to correspond with the 'rowLabelCollectionType' parameter. Can be string, or boost::posix_time::ptime etc.
+    // Several cases are possible for hasColLabels and hasRowLabels params:
     // 1. No row labels, no column labels are provided in the csv
     // 2. Row labels and/or column labels are provided in the csv
 
@@ -127,7 +131,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
     // simplest case: no labels present in file
     if(!hasColLabels && !hasRowLabels){
         rawData = RawMatrix<dataType>(fileName);
-        rowNames = rowLabelCollectionType(CreateDefaultLabels(default_rowLabel_str, rawData.GetNrRows()));
+        rowNames.SetDefaultLabels(default_rowLabel_str, rawData.GetNrRows());
         colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
 
         // Call constructor (Validation is done inside constructor)

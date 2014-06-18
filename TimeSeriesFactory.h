@@ -11,6 +11,7 @@
 
 #include "TimeSeries.h"
 #include "LMatrixFactory.h"
+#include "StringLabels.h"
 #include "boost/date_time/local_time/local_time.hpp"
 
 
@@ -75,13 +76,14 @@ CreateSimpleTimeSeriesFromCsv(const string& fileName, const string& dateTimeForm
 
     TimeSeries<dataType, dtContainerType, dtElementType> result;
 
-//    // Read and process the file, create an object of the base class with strings as row labels
-//    LMatrix<dataType, vector<string>, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<dataType, vector<string>, string>(fileName, hasColLabels, true);
-//
+    // Read and process the file, create an object of the base class with strings as row labels
+    LMatrix<dataType, StringLabels, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<dataType, StringLabels, string>(fileName, hasColLabels, true);
+
+
 //    // Change the row labels from strings into dtElementType's
-//    vector<string> orgRowLabels = mat.GetRowLabels();
+//    StringLabels orgRowLabels = mat.GetRowLabels();
 //    dtContainerType dts = StringVectorToDateTimes<dtContainerType, dtElementType>(orgRowLabels, dateTimeFormat);
-//
+
 //    // Create a TimeSeries object
 
  
