@@ -8,12 +8,15 @@
 
 #include <iostream>
 #include "boost/date_time/local_time/local_time.hpp"
-#include "TimeSeriesFactory.h"
+#include "LMatrixFactory.h"
+#include "LMatrix.h"
 #include "DateTimeLabels.h"
+#include "StringLabels.h"
 #include <string>
 
 using namespace boost::posix_time;
 using namespace std;
+
 // Tests
 //#include <igloo/igloo.h>
 //#include "Tests_Matrix.h"
@@ -22,12 +25,15 @@ using namespace std;
 int main(int argc, const char * argv[])
 {
 
-    TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, boost::posix_time::ptime>("/Users/shimritabraham/Documents/work/smallfile.csv", "%Y-%m-%dT%H:%M:%S%F%Q", true);
-    //vector<string>rNames = mat.GetRowLabels();
+    LMatrix<double, DateTimeLabels, ptime> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true, "");
+    cout<<mat<<endl;
 
-//    LMatrix<double, StringLabels, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, StringLabels, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
-//
-//    cout<<mat<<endl;
+
+    //TimeSeries<double, DateTimeLabels, ptime> ts =
+//    TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/smallfile.csv", "%Y-%m-%dT%H:%M:%S%F%Q", true);
+
+
+
 
 
 //    boost::posix_time::ptime dt(boost::posix_time::not_a_date_time);

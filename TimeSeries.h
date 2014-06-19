@@ -18,6 +18,7 @@ class TimeSeries: public LMatrix<dataType, dtContainerType, dtElementType>{
 
 public:
     TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames);
+    TimeSeries(LMatrix<dataType, dtContainerType, dtElementType> mat);
     TimeSeries():LMatrix<dataType, dtContainerType, dtElementType>(){};
     ~TimeSeries(){};
 
@@ -42,6 +43,23 @@ Intersect(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const
 
 TimeSeries<class dataType, class dtContainerType, class dtElementType>
 Union(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const TimeSeries<dataType, dtContainerType, dtElementType>& ts2);
+
+
+template <class dataType, class dtContainerType, class dtElementType>
+TimeSeries<dataType, dtContainerType, dtElementType>::
+TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames):
+LMatrix<dataType, dtContainerType, dtElementType>(rawData, rowNames, colNames){
+    // FIXME: validate!
+}
+
+
+template <class dataType, class dtContainerType, class dtElementType>
+TimeSeries<dataType, dtContainerType, dtElementType>::
+TimeSeries(LMatrix<dataType, dtContainerType, dtElementType> mat): LMatrix<dataType, dtContainerType, dtElementType>(mat){
+    // FIXME: validate!
+}
+
+
 
 
 

@@ -34,8 +34,10 @@ public:
 
     // Note: LMatrix objects should be created via Factory functions, not via the constructor
     LMatrix(RawMatrix<dataType>& rawData, rowLabelCollectionType& rowNames, strVec& colNames);
+    LMatrix(const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& mat);
     LMatrix();
     ~LMatrix(){};
+
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -197,6 +199,15 @@ LMatrix(){
 
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+LMatrix(const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& mat){
+    itsRawData = mat.itsRawData;
+    itsColLabels = mat.itsColLabels;
+    itsRowLabels =mat.itsRowLabels;
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 void LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 ValidateObject() const{
 
@@ -330,11 +341,14 @@ operator() (const rowLabelElementType& rowName, const std::string& colName){
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 ostream& operator<< (ostream& str,  LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& mat){
 
+
+
     // ASK: Ideally, these parameters should live in some config file. How do I do this?
     const int& fieldWidth = 20;
     const int& maxCols = 4;
     const int& maxRows = 10;
     const int& precision = 8;
+
 
     size_t nRows = mat.GetNrRows();
     size_t nCols = mat.GetNrCols();

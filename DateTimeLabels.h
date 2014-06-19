@@ -19,9 +19,12 @@ class DateTimeLabels{
 public:
 
     // Con/De-structors
-    DateTimeLabels(vector<pt> data):itsData(data){}
+    DateTimeLabels(vector<pt> data, const string inputFormat):itsData(data), itsInputFormat(inputFormat){}
+    DateTimeLabels(const string inputFormat):itsInputFormat(inputFormat){}
     DateTimeLabels(){}
+    DateTimeLabels(const DateTimeLabels& otherObj){itsData = otherObj.itsData;};
     ~DateTimeLabels(){}
+
 
     // Operators
     const pt& operator[](const size_t idx) const {return itsData[idx];}
@@ -29,14 +32,18 @@ public:
 
     // General Utils
     void push_back(pt dt){itsData.push_back(dt);}
+    void push_back(string str);
     vector<string> to_string() const;
     size_t size() const {return itsData.size();}
     size_t find(const pt td) const ;
     void SetDefaultLabels(string& str, const size_t& len);
+    void Swap(const DateTimeLabels& rhs);
+    DateTimeLabels& operator=(const DateTimeLabels& rhs);
 
 
 private:
     vector<pt> itsData;
+    string itsInputFormat;
 };
 
 #endif

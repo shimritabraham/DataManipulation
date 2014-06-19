@@ -17,7 +17,9 @@ class StringLabels{
 public:
 
     // Con/De-structors
-    StringLabels(vector<string> data):itsData(data){}
+    StringLabels(vector<string> data, const string inputFormat):itsData(data), itsInputFormat(inputFormat){}
+    StringLabels(const string inputFormat):itsInputFormat(inputFormat){}
+    StringLabels(const StringLabels& otherObj){itsData = otherObj.itsData;};
     StringLabels(){}
     ~StringLabels(){};
 
@@ -31,10 +33,14 @@ public:
     size_t size() const {return itsData.size();}
     size_t find(const string& str) const ;
     void SetDefaultLabels(string& str, const size_t& len);
+    StringLabels& operator= (const StringLabels& otherObj);
 
 
 private:
     vector<string> itsData;
+    string itsInputFormat;
+
+    void swap(StringLabels& rhs);
 };
 
 #endif

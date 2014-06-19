@@ -16,6 +16,7 @@
 #include "FileInputManager.h"
 #include <boost/shared_ptr.hpp>
 #include "Utils.h"
+#include "StringLabels.h"
 using namespace std;
 
 
@@ -27,7 +28,7 @@ namespace LMatrixFactory{
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
     LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
-    CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false);
+    CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false, const string rowLabelInputFormat = "");
 
     // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
@@ -83,7 +84,7 @@ namespace {
     void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin){
 
         string line;
-        rowLabelElementType rowName;
+        string strRowName;
         while(getline(fin, line, '\n')){
             // process string to make it easily convertible to a vector
 
@@ -95,8 +96,8 @@ namespace {
             stringstream in(line);
 
             // read and save row name first
-            in>>rowName;
-            rowLabels.push_back(rowName);
+            in>>strRowName;
+            rowLabels.push_back(strRowName);
 
             // then add the rest of the data to result
             (*pData).push_back(vector<dataType>(istream_iterator<dataType>(in), istream_iterator<dataType>()));
@@ -108,7 +109,10 @@ namespace {
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrixFactory::
-CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels){
+CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels, const string rowLabelInputFormat){
+
+
+
     // This is a simple labelled matrix implementation that is not optimised for speed.
 
     // PARAMETERS:
@@ -121,12 +125,11 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
     // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
 
-    strVec colNames;
-    rowLabelCollectionType rowNames;
+    vector<string> colNames;
+    rowLabelCollectionType rowNames(rowLabelInputFormat);
     RawMatrix<dataType> rawData;
     string default_rowLabel_str = "row_";
     string default_colLabel_str = "col_";
-
 
     // simplest case: no labels present in file
     if(!hasColLabels && !hasRowLabels){
@@ -169,6 +172,8 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
 
     //ASK: Can I avoid returning by value in this function?
+
+
 
 }
 

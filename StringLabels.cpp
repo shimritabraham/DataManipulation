@@ -27,9 +27,6 @@ find(const string& str) const{
 }
 
 
-
-
-
 void StringLabels::
 SetDefaultLabels(string& str, const size_t& len){
     vector<string> result(len);
@@ -38,6 +35,24 @@ SetDefaultLabels(string& str, const size_t& len){
     }
     itsData = result;
 }
+
+
+
+void StringLabels::
+swap(StringLabels& rhs){
+    itsData = rhs.itsData;
+    itsInputFormat = rhs.itsInputFormat;
+}
+
+
+StringLabels& StringLabels::
+operator= (const StringLabels& rhs){
+    StringLabels tmp(rhs);
+    swap(tmp);
+    return *this;
+}
+
+
 
 
 
