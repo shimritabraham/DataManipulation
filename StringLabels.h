@@ -1,5 +1,5 @@
 //
-//  Labels.h
+//  StringLabels.h
 //  DataManipulation
 //
 //  Created by Shimrit Abraham on 17/06/2014.
@@ -34,6 +34,7 @@ public:
     size_t find(const string& str) const ;
     void SetDefaultLabels(string& str, const size_t& len);
     StringLabels& operator= (const StringLabels& otherObj);
+    bool is_sorted();
 
 
 private:

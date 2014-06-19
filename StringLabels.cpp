@@ -53,6 +53,9 @@ operator= (const StringLabels& rhs){
 }
 
 
-
+bool StringLabels::
+is_sorted(){
+    return std::is_sorted(itsData.begin(), itsData.end());
+}
 
 

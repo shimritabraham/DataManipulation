@@ -45,18 +45,36 @@ TimeSeries<class dataType, class dtContainerType, class dtElementType>
 Union(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const TimeSeries<dataType, dtContainerType, dtElementType>& ts2);
 
 
+
+
+
+
+//--------------------------------------------------------------------------------------------------
+// --------------------------- Function Definitions ------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+template<class dateType, class dtContainerType, class dtElementType>
+void TimeSeries<dateType, dtContainerType, dtElementType>::
+ValidateObject(){
+    //ASK: How to I check that the dtElementType is some sort of date/time object here?
+
+    LMatrix<dateType, dtContainerType, dtElementType>::ValidateObject();
+
+}
+
+
 template <class dataType, class dtContainerType, class dtElementType>
 TimeSeries<dataType, dtContainerType, dtElementType>::
 TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames):
-LMatrix<dataType, dtContainerType, dtElementType>(rawData, rowNames, colNames){
-    // FIXME: validate!
+        LMatrix<dataType, dtContainerType, dtElementType>(rawData, rowNames, colNames){
+    ValidateObject();
 }
 
 
 template <class dataType, class dtContainerType, class dtElementType>
 TimeSeries<dataType, dtContainerType, dtElementType>::
 TimeSeries(LMatrix<dataType, dtContainerType, dtElementType> mat): LMatrix<dataType, dtContainerType, dtElementType>(mat){
-    // FIXME: validate!
+    ValidateObject();
 }
 
 

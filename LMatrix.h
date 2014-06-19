@@ -223,6 +223,7 @@ ValidateObject() const{
     if(itsRawData.GetNrRows() != itsRowLabels.size())
         throw string("ERROR:\tLength of row labels does not match number of rows in data")+
         string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+
 }
 
 

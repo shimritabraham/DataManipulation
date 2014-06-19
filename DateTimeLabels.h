@@ -39,7 +39,7 @@ public:
     void SetDefaultLabels(string& str, const size_t& len);
     void Swap(const DateTimeLabels& rhs);
     DateTimeLabels& operator=(const DateTimeLabels& rhs);
-
+    bool is_sorted();
 
 private:
     vector<pt> itsData;

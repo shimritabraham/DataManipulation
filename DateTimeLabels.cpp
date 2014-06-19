@@ -80,6 +80,12 @@ operator=(const DateTimeLabels& rhs){
 }
 
 
+bool DateTimeLabels::
+is_sorted(){
+    return std::is_sorted(itsData.begin(), itsData.end());
+}
+
+
 
 
 
