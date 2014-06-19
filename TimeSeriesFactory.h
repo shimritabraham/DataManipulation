@@ -28,27 +28,20 @@ namespace TimeSeriesFactory{
 
 }
 
-
-
-
-
-
 template<class dataType, class dtContainerType, class dtElementType>
 TimeSeries<dataType, dtContainerType, dtElementType> TimeSeriesFactory::
 CreateSimpleTimeSeriesFromCsv(const string& fileName, const string& dateTimeFormat, const bool hasColLabels){
     // This is a simple TimeSeries implementation that is not optimised for speed.
     // The code is able to cope with and without the colnames being provided in the file
 
+    // Read and process the file, create an object of the base class
+    LMatrix<dataType, dtContainerType, dtElementType> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<dataType, dtContainerType, dtElementType>(fileName, hasColLabels, true, dateTimeFormat);
 
 
-    // Read and process the file, create an object of the base class with strings as row labels
-    LMatrixFactory::CreateSimpleLMatrixFromCsv<dataType, dtContainerType, dtElementType>(fileName, hasColLabels, true, dateTimeFormat);
+    // Create a TimeSeries object using the LMatric base object
+    TimeSeries<dataType, dtContainerType, dtElementType> result(mat);
 
-
-//    TimeSeries<dataType, dtContainerType, dtElementType> result(mat);
-
-    TimeSeries<dataType, dtContainerType, dtElementType> result;
-    return result ;
+    return result;
 
 }
 
