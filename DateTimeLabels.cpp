@@ -55,21 +55,20 @@ SetDefaultLabels(const string& str, const size_t& len){
 
 
 void DateTimeLabels::
-push_back(string str){
+push_back(const string& str, const string& inputFormat){
     ptime dt(not_a_date_time);
     std::stringstream ss;
-    boost::local_time::local_time_input_facet* myFacet(new boost::local_time::local_time_input_facet(itsInputFormat));
+    boost::local_time::local_time_input_facet* myFacet(new boost::local_time::local_time_input_facet(inputFormat));
     ss.imbue(std::locale(std::locale::classic(), myFacet));
     ss.str(str);
     ss >> dt;
-    LabelContainer::push_back(dt);
+    LabelContainer::push_back(dt, inputFormat);
 }
 
 
 void DateTimeLabels::
 swap(const DateTimeLabels& rhs){
     itsData = rhs.itsData;
-    itsInputFormat = rhs.itsInputFormat;
 }
 
 

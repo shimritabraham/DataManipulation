@@ -20,14 +20,14 @@ class DateTimeLabels:public LabelContainer<pt>{
 public:
 
     // Con/De-structors
-    DateTimeLabels(vector<pt> data, const string inputFormat):LabelContainer<pt>(data), itsInputFormat(inputFormat){}
-    DateTimeLabels(const string inputFormat):LabelContainer<pt>(), itsInputFormat(inputFormat){}
+    DateTimeLabels(vector<pt> data, const string inputFormat):LabelContainer<pt>(data){}
+    DateTimeLabels(const string inputFormat):LabelContainer<pt>(){}
     DateTimeLabels():LabelContainer<pt>(){}
-    DateTimeLabels(const DateTimeLabels& otherObj):LabelContainer<pt>(otherObj.itsData), itsInputFormat(otherObj.itsInputFormat){};
+    DateTimeLabels(const DateTimeLabels& otherObj):LabelContainer<pt>(otherObj.itsData){};
     virtual ~DateTimeLabels(){}
 
     // General Utils
-    virtual void push_back(string str);
+    virtual void push_back(const string& str, const string& inputFormat);
     virtual vector<string> to_string() const;
     virtual size_t find(const pt td) const ;
     virtual void SetDefaultLabels(const string& str, const size_t& len);
@@ -35,8 +35,6 @@ public:
     virtual DateTimeLabels& operator=(const DateTimeLabels& rhs);
 
     friend ostream& operator<< (ostream& stream, DateTimeLabels& rhs) ;
-private:
-    string itsInputFormat;
 };
 
 #endif

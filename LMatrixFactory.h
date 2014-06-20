@@ -40,7 +40,7 @@ namespace {
 
     // Function declarations
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin);
+    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin, const string& rowLabelInputFormat);
 
     vector<string> CreateDefaultLabels(string& str, const size_t& len);
 
@@ -81,7 +81,7 @@ namespace {
 
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin){
+    void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin, const string& rowLabelInputFormat){
 
         string line;
         string strRowName;
@@ -97,7 +97,7 @@ namespace {
 
             // read and save row name first
             in>>strRowName;
-            rowLabels.push_back(strRowName);
+            rowLabels.push_back(strRowName, rowLabelInputFormat);
 
             // then add the rest of the data to result
             (*pData).push_back(vector<dataType>(istream_iterator<dataType>(in), istream_iterator<dataType>()));
@@ -126,7 +126,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
     // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
 
     vector<string> colNames;
-    rowLabelCollectionType rowNames(rowLabelInputFormat);
+    rowLabelCollectionType rowNames;
     RawMatrix<dataType> rawData;
     string default_rowLabel_str = "row_";
     string default_colLabel_str = "col_";
@@ -154,7 +154,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
     if(hasRowLabels){
         // read data and row labels from file
         boost::shared_ptr<vector<vector<dataType>>> pData(new(vector<vector<dataType>>));
-        ReadFileWithRowNames<dataType, rowLabelCollectionType, rowLabelElementType>(pData, rowNames, fin);
+        ReadFileWithRowNames<dataType, rowLabelCollectionType, rowLabelElementType>(pData, rowNames, fin, rowLabelInputFormat);
         rawData = RawMatrix<dataType>(pData);
     }else{
         // read only the data from file, activate default row labels

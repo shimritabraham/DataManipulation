@@ -39,7 +39,6 @@ SetDefaultLabels(const string& str, const size_t& len){
 void StringLabels::
 swap(StringLabels& rhs){
     LabelContainer::swap(rhs);
-    itsInputFormat = rhs.itsInputFormat;
 }
 
 

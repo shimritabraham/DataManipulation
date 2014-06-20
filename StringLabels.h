@@ -19,9 +19,9 @@ class StringLabels:public LabelContainer<string>{
 public:
 
     // Con/De-structors
-    StringLabels(vector<string> data, const string inputFormat):LabelContainer<string>(data), itsInputFormat(inputFormat){}
-    StringLabels(const string inputFormat):LabelContainer<string>(), itsInputFormat(inputFormat){}
-    StringLabels(const StringLabels& otherObj):LabelContainer<string>(otherObj.itsData), itsInputFormat(otherObj.itsInputFormat){};
+    StringLabels(vector<string> data, const string inputFormat):LabelContainer<string>(data){}
+    StringLabels(const string inputFormat):LabelContainer<string>(){}
+    StringLabels(const StringLabels& otherObj):LabelContainer<string>(otherObj.itsData){};
     StringLabels():LabelContainer<string>(){}
     virtual ~StringLabels(){};
 

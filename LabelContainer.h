@@ -26,7 +26,7 @@ public:
 
     // Operators
     const elementType& operator[](const size_t idx) const {return itsData[idx];}
-    virtual void push_back(elementType x){itsData.push_back(x);}
+    virtual void push_back(const elementType& x, const string& inputFormat){itsData.push_back(x);}
     size_t size() const {return itsData.size();}
     virtual size_t find(const elementType& x) const ;
     virtual void swap(const LabelContainer& rhs);
