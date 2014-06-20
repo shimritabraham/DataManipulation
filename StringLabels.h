@@ -10,38 +10,33 @@
 #define DataManipulation_Labels_h
 #include <vector>
 #include <string>
+#include "LabelContainer.h"
 
 using namespace std;
 
-class StringLabels{
+
+class StringLabels:public LabelContainer<string>{
 public:
 
     // Con/De-structors
-    StringLabels(vector<string> data, const string inputFormat):itsData(data), itsInputFormat(inputFormat){}
-    StringLabels(const string inputFormat):itsInputFormat(inputFormat){}
-    StringLabels(const StringLabels& otherObj){itsData = otherObj.itsData;};
-    StringLabels(){}
-    ~StringLabels(){};
-
-    // Operators
-    const string& operator[](const size_t idx) const {return itsData[idx];}
-          string& operator[](const size_t idx)       {return itsData[idx];}
+    StringLabels(vector<string> data, const string inputFormat):LabelContainer<string>(data), itsInputFormat(inputFormat){}
+    StringLabels(const string inputFormat):LabelContainer<string>(), itsInputFormat(inputFormat){}
+    StringLabels(const StringLabels& otherObj):LabelContainer<string>(otherObj.itsData), itsInputFormat(otherObj.itsInputFormat){};
+    StringLabels():LabelContainer<string>(){}
+    virtual ~StringLabels(){};
 
     // General Utils
-    void push_back(string str){itsData.push_back(str);}
-    vector<string> to_string() const {return itsData;}
-    size_t size() const {return itsData.size();}
-    size_t find(const string& str) const ;
-    void SetDefaultLabels(string& str, const size_t& len);
-    StringLabels& operator= (const StringLabels& otherObj);
-    bool is_sorted();
+    virtual vector<string> to_string() const {return itsData;}
+    virtual size_t find(const string& str) const ;
+    virtual void SetDefaultLabels(const string& str, const size_t& len);
+    virtual void swap(StringLabels& rhs);
+    virtual StringLabels& operator= (const StringLabels& otherObj);
+
 
 
 private:
-    vector<string> itsData;
     string itsInputFormat;
 
-    void swap(StringLabels& rhs);
 };
 
 #endif

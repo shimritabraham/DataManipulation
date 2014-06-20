@@ -14,6 +14,8 @@
 #include "DateTimeLabels.h"
 #include "StringLabels.h"
 #include <string>
+#include <vector>
+#include "Utils.h"
 
 using namespace boost::posix_time;
 using namespace std;
@@ -34,6 +36,7 @@ int main(int argc, const char * argv[])
     //LMatrix
     LMatrix<double, StringLabels, string>  mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, StringLabels, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true, "%Y-%m-%dT%H:%M:%S%F%Q");
     cout<<mat<<endl;
+
 
     return 0;
     //return igloo::TestRunner::RunAllTests();

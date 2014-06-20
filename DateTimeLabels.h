@@ -11,38 +11,31 @@
 
 #include "boost/date_time/local_time/local_time.hpp"
 #include <vector>
+#include "LabelContainer.h"
 
 typedef boost::posix_time::ptime pt;
 using namespace std;
 
-class DateTimeLabels{
+class DateTimeLabels:public LabelContainer<pt>{
 public:
 
     // Con/De-structors
-    DateTimeLabels(vector<pt> data, const string inputFormat):itsData(data), itsInputFormat(inputFormat){}
-    DateTimeLabels(const string inputFormat):itsInputFormat(inputFormat){}
-    DateTimeLabels(){}
-    DateTimeLabels(const DateTimeLabels& otherObj){itsData = otherObj.itsData;};
-    ~DateTimeLabels(){}
-
-
-    // Operators
-    const pt& operator[](const size_t idx) const {return itsData[idx];}
-          pt& operator[](const size_t idx)       {return itsData[idx];}
+    DateTimeLabels(vector<pt> data, const string inputFormat):LabelContainer<pt>(data), itsInputFormat(inputFormat){}
+    DateTimeLabels(const string inputFormat):LabelContainer<pt>(), itsInputFormat(inputFormat){}
+    DateTimeLabels():LabelContainer<pt>(){}
+    DateTimeLabels(const DateTimeLabels& otherObj):LabelContainer<pt>(otherObj.itsData), itsInputFormat(otherObj.itsInputFormat){};
+    virtual ~DateTimeLabels(){}
 
     // General Utils
-    void push_back(pt dt){itsData.push_back(dt);}
-    void push_back(string str);
-    vector<string> to_string() const;
-    size_t size() const {return itsData.size();}
-    size_t find(const pt td) const ;
-    void SetDefaultLabels(string& str, const size_t& len);
-    void Swap(const DateTimeLabels& rhs);
-    DateTimeLabels& operator=(const DateTimeLabels& rhs);
-    bool is_sorted();
+    virtual void push_back(string str);
+    virtual vector<string> to_string() const;
+    virtual size_t find(const pt td) const ;
+    virtual void SetDefaultLabels(const string& str, const size_t& len);
+    virtual void swap(const DateTimeLabels& rhs);
+    virtual DateTimeLabels& operator=(const DateTimeLabels& rhs);
 
+    friend ostream& operator<< (ostream& stream, DateTimeLabels& rhs) ;
 private:
-    vector<pt> itsData;
     string itsInputFormat;
 };
 

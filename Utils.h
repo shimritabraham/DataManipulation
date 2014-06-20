@@ -9,6 +9,8 @@
 #ifndef DataManipulation_Utils_h
 #define DataManipulation_Utils_h
 
+#include <iostream>
+
 template<class T>
 ostream& operator<< (ostream& str, const vector<T>& vec){
     size_t maxVecSize = 10;

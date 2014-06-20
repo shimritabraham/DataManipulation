@@ -8,7 +8,7 @@
 
 #include "StringLabels.h"
 #include <string>
-
+#include "Utils.h"
 
 size_t StringLabels::
 find(const string& str) const{
@@ -28,19 +28,17 @@ find(const string& str) const{
 
 
 void StringLabels::
-SetDefaultLabels(string& str, const size_t& len){
+SetDefaultLabels(const string& str, const size_t& len){
     vector<string> result(len);
     for(size_t i =0; i<len; i++){
         result[i] = str+std::to_string(i);
     }
-    itsData = result;
+    SetData(result);
 }
-
-
 
 void StringLabels::
 swap(StringLabels& rhs){
-    itsData = rhs.itsData;
+    LabelContainer::swap(rhs);
     itsInputFormat = rhs.itsInputFormat;
 }
 
@@ -52,10 +50,5 @@ operator= (const StringLabels& rhs){
     return *this;
 }
 
-
-bool StringLabels::
-is_sorted(){
-    return std::is_sorted(itsData.begin(), itsData.end());
-}
 
 
