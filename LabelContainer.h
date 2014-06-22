@@ -10,6 +10,7 @@
 #define DataManipulation_LabelContainer_h
 
 #include <vector>
+#include <set>
 using namespace std;
 
 template<class elementType>
@@ -26,18 +27,19 @@ public:
 
     // Operators
     const elementType& operator[](const size_t idx) const {return itsData[idx];}
+    virtual LabelContainer<elementType>& operator= (const LabelContainer& otherObj);
+
+    // Util Functions
     virtual void push_back(const elementType& x, const string& inputFormat){itsData.push_back(x);}
     size_t size() const {return itsData.size();}
     virtual size_t find(const elementType& x) const ;
     virtual void swap(const LabelContainer& rhs);
-    virtual LabelContainer<elementType>& operator= (const LabelContainer& otherObj);
+    bool is_sorted() const{return std::is_sorted(itsData.begin(), itsData.end());}
+    bool is_unique() const;
 
     // Pure virtual functions
     virtual vector<string> to_string() const = 0;
     virtual void SetDefaultLabels(const string& helper, const size_t& len) = 0;
-
-    // Util Functions
-    bool is_sorted() const{return std::is_sorted(itsData.begin(), itsData.end());}
 
     // Friend Functions
     friend ostream& operator<< (ostream& stream, vector<elementType>& rhs);
@@ -89,5 +91,12 @@ ostream& operator<< (ostream& stream, vector<elementType>& rhs) {
     return stream;
 }
 
+
+template<class elementType>
+bool LabelContainer<elementType>::
+is_unique() const{
+    set <elementType> setEquivalent(itsData.begin(), itsData.end());
+    return setEquivalent.size() == itsData.size();
+}
 
 #endif

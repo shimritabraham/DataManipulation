@@ -28,10 +28,11 @@ using namespace std;
 int main(int argc, const char * argv[])
 {
 
-
     //TimeSeries
     TimeSeries<double, DateTimeLabels, ptime> ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/smallfile.csv", "%Y-%m-%dT%H:%M:%S%F%Q", true);
     cout<<ts<<endl;
+    cout<<ts.is_unique()<<endl;
+
 
     //LMatrix
     LMatrix<double, StringLabels, string>  mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, StringLabels, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true, "%Y-%m-%dT%H:%M:%S%F%Q");

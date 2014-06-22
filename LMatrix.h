@@ -28,13 +28,15 @@ class LMatrix{
 
 public:
 
+    typedef LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LM;
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Con/De structors ~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Note: LMatrix objects should be created via Factory functions, not via the constructor
     LMatrix(RawMatrix<dataType>& rawData, rowLabelCollectionType& rowNames, strVec& colNames);
-    LMatrix(const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& mat);
+    LMatrix(const LM& mat);
     LMatrix();
     ~LMatrix(){};
 
@@ -83,7 +85,11 @@ public:
     friend ostream& operator<< (ostream& str,  LMatrix<dt, rlct, rlet>& mat);
 
 
-private:
+protected:
+    bool is_sorted() const {return itsRowLabels.is_sorted();}
+    bool is_unique() const {return itsRowLabels.is_unique();}
+
+
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Data Members ~~~~~~~~~~~~~~

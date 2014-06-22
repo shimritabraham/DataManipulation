@@ -16,21 +16,19 @@ template<class dataType, class dtContainerType, class dtElementType>
 class TimeSeries: public LMatrix<dataType, dtContainerType, dtElementType>{
     // a TimeSeries object is a special kind of Labelled Matrix where the rownames represent timestamps
 
+    typedef LMatrix<dataType, dtContainerType, dtElementType> LM;
+
 public:
     TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames);
-    TimeSeries(LMatrix<dataType, dtContainerType, dtElementType> mat);
-    TimeSeries():LMatrix<dataType, dtContainerType, dtElementType>(){};
+    TimeSeries(LM mat);
+    TimeSeries():LM(){};
     ~TimeSeries(){};
 
 
     // Util functions:
-    void ValidateObject();
-    bool IsSorted();
-    bool IsUnique();
-    void Sort();
-
-    //FIXME: check if cout works
-
+    void ValidateObject() const;
+    bool is_sorted()      const{return LM::is_sorted();}
+    bool is_unique()      const{return LM::is_unique();}
 
 };
 
@@ -55,18 +53,32 @@ Union(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const Tim
 
 template<class dateType, class dtContainerType, class dtElementType>
 void TimeSeries<dateType, dtContainerType, dtElementType>::
-ValidateObject(){
-    //ASK: How to I check that the dtElementType is some sort of date/time object here?
+ValidateObject() const {
 
+    //ASK: How do I check that dtElementType is some sort of date/time object here?
+
+    // Validate the data
     LMatrix<dateType, dtContainerType, dtElementType>::ValidateObject();
 
+    // Check that the labels are sorted and unique
+    if(!is_sorted()){
+        throw string("ERROR:\tTimeSeries labels are not sorted")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+std::to_string(__LINE__);
+    }
+    if(!is_unique()){
+        throw string("ERROR:\tTimeSeries labels are not unique")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+std::to_string(__LINE__);
+    }
+
 }
+
 
 
 template <class dataType, class dtContainerType, class dtElementType>
 TimeSeries<dataType, dtContainerType, dtElementType>::
 TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames):
         LMatrix<dataType, dtContainerType, dtElementType>(rawData, rowNames, colNames){
+
     ValidateObject();
 }
 
@@ -74,10 +86,9 @@ TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colN
 template <class dataType, class dtContainerType, class dtElementType>
 TimeSeries<dataType, dtContainerType, dtElementType>::
 TimeSeries(LMatrix<dataType, dtContainerType, dtElementType> mat): LMatrix<dataType, dtContainerType, dtElementType>(mat){
+
     ValidateObject();
 }
-
-
 
 
 

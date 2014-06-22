@@ -37,7 +37,6 @@ namespace LMatrixFactory{
 namespace {
     // These functions are hidden, only used in this file
 
-
     // Function declarations
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
     void ReadFileWithRowNames(boost::shared_ptr<vector<vector<dataType>>> pData, rowLabelCollectionType& rowLabels, istream& fin, const string& rowLabelInputFormat);
@@ -110,9 +109,7 @@ namespace {
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrixFactory::
 CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels, const string rowLabelInputFormat){
-
-
-
+    
     // This is a simple labelled matrix implementation that is not optimised for speed.
 
     // PARAMETERS:
@@ -125,6 +122,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
     // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
 
+    typedef LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LM;
     vector<string> colNames;
     rowLabelCollectionType rowNames;
     RawMatrix<dataType> rawData;
@@ -138,7 +136,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
         colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
 
         // Call constructor (Validation is done inside constructor)
-        return LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>(rawData, rowNames, colNames);
+        return LM(rawData, rowNames, colNames);
     }
 
     // Assuming there are row and/or col labels, we need a file handler
@@ -168,7 +166,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
 
     // Finally, call the LMatrix constructor (Validation is done inside constructor)
-    return LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>(rawData, rowNames, colNames);
+    return LM(rawData, rowNames, colNames);
 
 
     //ASK: Can I avoid returning by value in this function?
