@@ -17,12 +17,27 @@ class TimeSeries: public LMatrix<dataType, dtContainerType, dtElementType>{
     // a TimeSeries object is a special kind of Labelled Matrix where the rownames represent timestamps
 
     typedef LMatrix<dataType, dtContainerType, dtElementType> LM;
+    typedef TimeSeries <dataType, dtContainerType, dtElementType> TS;
 
 public:
     TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames);
     TimeSeries(LM mat);
     TimeSeries():LM(){};
     ~TimeSeries(){};
+
+
+    // Accessor functions
+    // FIXME: finish defining row() and col() for TS
+    const TS row(const dtElementType& name) const {return TimeSeries(LM::row(name));}
+          TS row(const dtElementType& name)       {return TimeSeries(LM::row(name));}
+    const TS row(const size_t& idx)         const {return TimeSeries(LM::row(idx));}
+          TS row(const size_t& idx)               {return TimeSeries(LM::row(idx));}
+
+    const TS col(const string& name)const   {return TimeSeries(LM::col(name));}
+          TS col(const string& name)        {return TimeSeries(LM::col(name));}
+    const TS col(const size_t& idx) const   {return TimeSeries(LM::col(idx));}
+          TS col(const size_t& idx)         {return TimeSeries(LM::col(idx));}
+
 
 
     // Util functions:

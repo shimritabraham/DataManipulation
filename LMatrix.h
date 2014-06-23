@@ -9,6 +9,7 @@
 #ifndef DataManipulation_LMatrix_h
 #define DataManipulation_LMatrix_h
 
+// FIXME: Check whether you really need all these includes
 #include <vector>
 #include <string>
 #include <iostream>
@@ -17,6 +18,7 @@
 #include <iterator>
 #include "FileInputManager.h"
 #include "RawMatrix.h"
+#include "boost/shared_ptr.hpp"
 using namespace std;
 
 typedef vector<string> strVec;
@@ -56,22 +58,33 @@ public:
     // printing
     std::ostream& operator<< (std::ostream& out);
 
-    // operators -- read/write
+    // operators -- read/write matrix elements, rows or columns
     const dataType& operator() (const size_t& rowIdx, const size_t& colIdx)const {return itsRawData(rowIdx, colIdx);};
           dataType& operator() (const size_t& rowIdx, const size_t& colIdx)      {return itsRawData(rowIdx, colIdx);};
     const dataType& operator() (const rowLabelElementType& rowName, const std::string& colName)const ;
           dataType& operator() (const rowLabelElementType& rowName, const std::string& colName);
 
-    const std::vector<dataType>& row(const size_t& idx) const  {return itsRawData.row(idx);}
-          std::vector<dataType>& row(const size_t& idx)        {return itsRawData.row(idx);}
-    const std::vector<dataType>& row(const rowLabelElementType& name) const;
-          std::vector<dataType>& row(const rowLabelElementType& name);
 
-    //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
-    const std::vector<dataType> col(const size_t& idx) const   {return itsRawData.col(idx);}
-          std::vector<dataType> col(const size_t& idx)         {return itsRawData.col(idx);}
-    const std::vector<dataType> col(const std::string& name) const;
-          std::vector<dataType> col(const std::string& name);
+    const std::vector<dataType>& raw_row(const size_t& idx) const  {return itsRawData.row(idx);}
+          std::vector<dataType>& raw_row(const size_t& idx)        {return itsRawData.row(idx);}
+    const std::vector<dataType>& raw_row(const rowLabelElementType& name) const;
+          std::vector<dataType>& raw_row(const rowLabelElementType& name);
+    const LM row(const rowLabelElementType& name) const;
+          LM row(const rowLabelElementType& name);
+    const LM row(const size_t& idx) const;
+          LM row(const size_t& idx);
+
+
+    //ASK: return type is ref in raw_row() and non-ref in raw_col(). Can this be avoided?
+    const std::vector<dataType> raw_col(const size_t& idx) const   {return itsRawData.col(idx);}
+          std::vector<dataType> raw_col(const size_t& idx)         {return itsRawData.col(idx);}
+    const std::vector<dataType> raw_col(const std::string& name) const;
+          std::vector<dataType> raw_col(const std::string& name);
+    const LM col(const string& name) const;
+          LM col(const string& name);
+    const LM col(const size_t& idx) const;
+          LM col(const size_t& idx);
+
 
     // Utils
     void ValidateObject() const;
@@ -142,7 +155,7 @@ namespace{
 
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-    void PrintLargeLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth, const int& maxRows, const int& maxCols){
+    void PrintLargeLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth, const size_t& maxRows, const size_t& maxCols){
 
         size_t nRows = mat.GetNrRows();
         size_t nCols = mat.GetNrCols();
@@ -153,7 +166,8 @@ namespace{
         for (size_t i=0; i<maxCols/2; i++){
             cout<<setw(fieldWidth)<<right<<colnames[i];
         }
-        cout<<setw(fieldWidth)<<"...";
+        if(nCols>maxCols)
+            cout<<setw(fieldWidth)<<"...";
         for (size_t i=nCols-maxCols/2-1; i<nCols; i++){
             cout<<setw(fieldWidth)<<right<<colnames[i];
         }
@@ -167,7 +181,8 @@ namespace{
             for (size_t j=0; j<maxCols/2; j++){
                 str<<setw(fieldWidth)<<right<<mat(i, j);
             }
-            cout<<setw(fieldWidth)<<"...";
+            if(nCols>maxCols)
+                cout<<setw(fieldWidth)<<"...";
             for (size_t j=nCols-maxCols/2-1; j<nCols; j++){
                 str<<setw(fieldWidth)<<right<<mat(i, j);
             }
@@ -175,9 +190,12 @@ namespace{
             str<<endl;
         }
 
-        cout<<"."<<endl;
-        cout<<"."<<endl;
-        cout<<"."<<endl;
+
+        if(nRows>maxRows){
+            cout<<"."<<endl;
+            cout<<"."<<endl;
+            cout<<"."<<endl;
+        }
 
         // print the tail of the matrix
         for (size_t i=nRows-maxRows/2-1; i<nRows; i++){
@@ -185,7 +203,8 @@ namespace{
             for (size_t j=0; j<maxCols/2; j++){
                 str<<setw(fieldWidth)<<right<<mat(i, j);
             }
-            cout<<setw(fieldWidth)<<"...";
+            if(nCols>maxCols)
+                cout<<setw(fieldWidth)<<"...";
             for (size_t j=nCols-maxCols/2-1; j<nCols; j++){
                 str<<setw(fieldWidth)<<right<<mat(i, j);
             }
@@ -352,8 +371,8 @@ ostream& operator<< (ostream& str,  LMatrix<dataType, rowLabelCollectionType, ro
 
     // ASK: Ideally, these parameters should live in some config file. How do I do this?
     const int& fieldWidth = 20;
-    const int& maxCols = 4;
-    const int& maxRows = 10;
+    const size_t& maxCols = 4;
+    const size_t& maxRows = 10;
     const int& precision = 8;
 
 
@@ -365,7 +384,9 @@ ostream& operator<< (ostream& str,  LMatrix<dataType, rowLabelCollectionType, ro
     if(nRows<=maxRows && nCols<=maxCols){
         PrintSmallLMatrix(str, mat, fieldWidth);
     }else{
-        PrintLargeLMatrix(str, mat, fieldWidth, maxRows, maxCols);
+        size_t adjMaxRows = std::min<size_t>(maxRows, nRows);
+        size_t adjMaxCols = std::min<size_t>(maxCols, nCols);
+        PrintLargeLMatrix(str, mat, fieldWidth, adjMaxRows, adjMaxCols);
     }
 
     return str;
@@ -374,24 +395,24 @@ ostream& operator<< (ostream& str,  LMatrix<dataType, rowLabelCollectionType, ro
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 const vector<dataType>& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
-row(const rowLabelElementType& name) const{
+raw_row(const rowLabelElementType& name) const{
     size_t idx = itsRowLabels.find(name);
-    return row(idx);
+    return raw_row(idx);
 }
 
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 vector<dataType>& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
-row(const rowLabelElementType& name){
+raw_row(const rowLabelElementType& name){
 
     size_t idx = itsRowLabels.find(name);
-    return row(idx);
+    return raw_row(idx);
 }
 
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 vector<dataType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
-col(const std::string& name){
+raw_col(const std::string& name){
 
     // check input
     strVec::iterator iElement = find(itsColLabels.begin(), itsColLabels.end(), name);
@@ -408,7 +429,7 @@ col(const std::string& name){
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 const std::vector<dataType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
-col(const std::string& name)const{
+raw_col(const std::string& name)const{
 
     // check input
     strVec::iterator iElement = find(itsColLabels.begin(), itsColLabels.end(), name);
@@ -421,7 +442,141 @@ col(const std::string& name)const{
 }
 
 
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+row(const rowLabelElementType& name){
 
+    // extract the raw row data
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    pRawData->push_back(raw_row(name));
+    RawMatrix<dataType> RM(pRawData);
+
+    // create row label object
+    vector<rowLabelElementType> rowNameVec = {name};
+    rowLabelCollectionType rowNameContainer(rowNameVec);
+
+    return LMatrix(RM, rowNameContainer, itsColLabels);
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+row(const rowLabelElementType& name) const{
+
+    // extract the raw row data
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    pRawData->push_back(raw_row(name));
+    RawMatrix<dataType> RM(pRawData);
+
+    // create row label object
+    vector<rowLabelElementType> rowNameVec = {name};
+    rowLabelCollectionType rowNameContainer(rowNameVec);
+
+    return LMatrix(RM, rowNameContainer, itsColLabels);
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+row(const size_t& idx){
+
+    // extract the raw row data
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    pRawData->push_back(raw_row(idx));
+    RawMatrix<dataType> RM(pRawData);
+
+    // create row label object
+    vector<rowLabelElementType> rowNameVec = {itsRowLabels[idx]};
+    rowLabelCollectionType rowNameContainer(rowNameVec);
+
+    return LMatrix(RM, rowNameContainer, itsColLabels);
+}
+
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+row(const size_t& idx) const{
+
+    // extract the raw row data
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    pRawData->push_back(raw_row(idx));
+    RawMatrix<dataType> RM(pRawData);
+
+    // create row label object
+    vector<rowLabelElementType> rowNameVec = {itsRowLabels[idx]};
+    rowLabelCollectionType rowNameContainer(rowNameVec);
+
+    return LMatrix(RM, rowNameContainer, itsColLabels);
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+col(const string& name){
+    vector<dataType> raw_data = raw_col(name);
+
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    for (size_t i=0; i<raw_data.size(); i++){
+        vector<dataType> x = {raw_data[i]};
+        pRawData->push_back(x);
+    }
+    RawMatrix<dataType> RM(pRawData);
+    vector<string> colLabels = {name};
+
+    return LMatrix(RM, itsRowLabels, colLabels);
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+col(const string& name) const {
+    vector<dataType> raw_data = raw_col(name);
+
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    for (size_t i=0; i<raw_data.size(); i++){
+        vector<dataType> x = {raw_data[i]};
+        pRawData->push_back(x);
+    }
+    RawMatrix<dataType> RM(pRawData);
+    vector<string> colLabels = {name};
+
+    return LMatrix(RM, itsRowLabels, colLabels);
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+col(const size_t& idx){
+    vector<dataType> raw_data = raw_col(idx);
+
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    for (size_t i=0; i<raw_data.size(); i++){
+        vector<dataType> x = {raw_data[i]};
+        pRawData->push_back(x);
+    }
+    RawMatrix<dataType> RM(pRawData);
+    vector<string> colLabels = {itsColLabels[idx]};
+
+    return LMatrix(RM, itsRowLabels, colLabels);
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+col(const size_t& idx) const {
+    vector<dataType> raw_data = raw_col(idx);
+
+    boost::shared_ptr <vector<vector<dataType>>> pRawData(new vector<vector<dataType>>);
+    for (size_t i=0; i<raw_data.size(); i++){
+        vector<dataType> x = {raw_data[i]};
+        pRawData->push_back(x);
+    }
+    RawMatrix<dataType> RM(pRawData);
+    vector<string> colLabels = {itsColLabels[idx]};
+
+    return LMatrix(RM, itsRowLabels, colLabels);
+}
 #endif
 
 

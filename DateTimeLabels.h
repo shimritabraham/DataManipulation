@@ -13,15 +13,17 @@
 #include <vector>
 #include "LabelContainer.h"
 
-typedef boost::posix_time::ptime pt;
+using namespace boost::posix_time;
 using namespace std;
+
+typedef boost::posix_time::ptime pt;
+
 
 class DateTimeLabels:public LabelContainer<pt>{
 public:
 
     // Con/De-structors
-    DateTimeLabels(vector<pt> data, const string inputFormat):LabelContainer<pt>(data){}
-    DateTimeLabels(const string inputFormat):LabelContainer<pt>(){}
+    DateTimeLabels(vector<pt> data):LabelContainer<pt>(data){}
     DateTimeLabels():LabelContainer<pt>(){}
     DateTimeLabels(const DateTimeLabels& otherObj):LabelContainer<pt>(otherObj.itsData){};
     virtual ~DateTimeLabels(){}
@@ -36,5 +38,74 @@ public:
 
     friend ostream& operator<< (ostream& stream, DateTimeLabels& rhs) ;
 };
+
+
+
+
+vector<string> DateTimeLabels::
+to_string() const{
+    vector<string> result;
+    for(size_t i=0; i<itsData.size(); i++){
+        result.push_back(to_simple_string(itsData[i]));
+    }
+    return result;
+}
+
+
+size_t DateTimeLabels::
+find(const pt td) const{
+
+    // do the search
+    vector<pt>::const_iterator iElement = std::find(itsData.begin(), itsData.end(), td);
+
+    // check if found
+    if(iElement == itsData.end()){
+        throw string("ERROR\tUnable to find \'")+to_simple_string(td)+string("\'")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+std::to_string(__LINE__);
+    }
+
+    // return distance from the start
+    return std::distance(itsData.begin(), iElement);
+}
+
+
+void DateTimeLabels::
+SetDefaultLabels(const string& str, const size_t& len){
+    //ignore the str variable in this case
+
+    vector<pt> result;
+    pt NaNDateTime = pt(boost::posix_time::not_a_date_time);
+    for (size_t i=0; i<len; i++){
+        result.push_back(NaNDateTime);
+    }
+    itsData = result;
+}
+
+
+void DateTimeLabels::
+push_back(const string& str, const string& inputFormat){
+    ptime dt(not_a_date_time);
+    std::stringstream ss;
+    boost::local_time::local_time_input_facet* myFacet(new boost::local_time::local_time_input_facet(inputFormat));
+    ss.imbue(std::locale(std::locale::classic(), myFacet));
+    ss.str(str);
+    ss >> dt;
+    LabelContainer::push_back(dt, inputFormat);
+}
+
+
+void DateTimeLabels::
+swap(const DateTimeLabels& rhs){
+    itsData = rhs.itsData;
+}
+
+
+DateTimeLabels& DateTimeLabels::
+operator=(const DateTimeLabels& rhs){
+    swap(rhs);
+    return *this;
+}
+
+
 
 #endif

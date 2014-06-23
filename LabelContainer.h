@@ -86,7 +86,7 @@ operator= (const LabelContainer& otherObj){
 
 
 template<class elementType>
-ostream& operator<< (ostream& stream, vector<elementType>& rhs) {
+ostream& operator<< (ostream& stream, LabelContainer<elementType>& rhs) {
     stream<<rhs.itsData;
     return stream;
 }

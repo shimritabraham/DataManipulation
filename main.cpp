@@ -8,6 +8,9 @@
 
 #include <iostream>
 #include "boost/date_time/local_time/local_time.hpp"
+#include "boost/date_time/posix_time/posix_time.hpp"
+#include "boost/date_time/gregorian/gregorian.hpp"
+
 #include "TimeSeriesFactory.h"
 #include "LMatrix.h"
 #include "TimeSeries.h"
@@ -18,6 +21,7 @@
 #include "Utils.h"
 
 using namespace boost::posix_time;
+using namespace boost::gregorian;
 using namespace std;
 
 // Tests
@@ -25,19 +29,29 @@ using namespace std;
 //#include "Tests_Matrix.h"
 
 
+typedef TimeSeries<double, DateTimeLabels, ptime> TS;
+
 int main(int argc, const char * argv[])
 {
 
     //TimeSeries
-    TimeSeries<double, DateTimeLabels, ptime> ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/smallfile.csv", "%Y-%m-%dT%H:%M:%S%F%Q", true);
+    TS ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
     cout<<ts<<endl;
-    cout<<ts.is_unique()<<endl;
 
+    ptime t(date(2014, 6, 5));
+    cout<<t<<endl;
+    TS tmp = ts.row(t);
+    cout<<tmp<<endl;
 
-    //LMatrix
-    LMatrix<double, StringLabels, string>  mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, StringLabels, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true, "%Y-%m-%dT%H:%M:%S%F%Q");
-    cout<<mat<<endl;
+    const size_t idx = 1;
+    TS tmp2 = ts.row(idx);
+    cout<<tmp2<<endl;
 
+    TS tmp3 = ts.col(string("GSPC.High"));
+    cout<<tmp3<<endl;
+
+    TS tmp4 = ts.col(idx);
+    cout<<tmp4<<endl;
 
     return 0;
     //return igloo::TestRunner::RunAllTests();
