@@ -11,11 +11,16 @@
 
 #include <vector>
 #include <set>
+#include <boost/shared_ptr.hpp>
+
 using namespace std;
+
 
 template<class elementType>
 class LabelContainer{
 public:
+    typedef boost::shared_ptr<LabelContainer<elementType>> pLC;
+
     //Con/De-structors
     LabelContainer(vector<elementType> data):itsData(data){};
     LabelContainer(const LabelContainer& rhs):itsData(rhs.itsData){}
@@ -44,12 +49,26 @@ public:
     // Friend Functions
     friend ostream& operator<< (ostream& stream, vector<elementType>& rhs);
 
-
-
 protected:
     vector<elementType> itsData;
 
 };
+
+
+
+//---------------------------------------------
+// Non-member function declarations
+//---------------------------------------------
+
+
+
+
+
+//---------------------------------------------
+// Function Definitions
+//---------------------------------------------
+
+
 
 
 template<class elementType>

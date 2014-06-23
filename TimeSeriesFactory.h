@@ -13,6 +13,7 @@
 #include "LMatrixFactory.h"
 #include "StringLabels.h"
 #include "boost/date_time/local_time/local_time.hpp"
+#include "boost/shared_ptr.hpp"
 
 
 namespace TimeSeriesFactory{
@@ -21,14 +22,15 @@ namespace TimeSeriesFactory{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     template<class dataType, class dtContainerType, class dtElementType>
-    TimeSeries<dataType, dtContainerType, dtElementType> CreateSimpleTimeSeriesFromCsv(const string& fileName, const string& dateTimeFormat, const bool hasColLabels = false);
+    boost::shared_ptr<TimeSeries<dataType, dtContainerType, dtElementType>>
+    CreateSimpleTimeSeriesFromCsv(const string& fileName, const string& dateTimeFormat, const bool hasColLabels = false);
 
 
 
 }
 
 template<class dataType, class dtContainerType, class dtElementType>
-TimeSeries<dataType, dtContainerType, dtElementType> TimeSeriesFactory::
+boost::shared_ptr<TimeSeries<dataType, dtContainerType, dtElementType>> TimeSeriesFactory::
 CreateSimpleTimeSeriesFromCsv(const string& fileName, const string& dateTimeFormat, const bool hasColLabels){
 
     // This is a simple TimeSeries implementation that is not optimised for speed.
@@ -38,13 +40,11 @@ CreateSimpleTimeSeriesFromCsv(const string& fileName, const string& dateTimeForm
     typedef TimeSeries<dataType, dtContainerType, dtElementType> TS;
 
     // Read and process the file, create an object of the base class
-    LM mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<dataType, dtContainerType, dtElementType>(fileName, hasColLabels, true, dateTimeFormat);
+    boost::shared_ptr<LM> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<dataType, dtContainerType, dtElementType>(fileName, hasColLabels, true, dateTimeFormat);
 
 
     // Create a TimeSeries object using the LMatric base object
-    TS ts(mat);
-
-    return ts;
+    return boost::shared_ptr<TS>(new TS(mat));
 
 }
 

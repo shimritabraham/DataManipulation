@@ -27,7 +27,7 @@ namespace LMatrixFactory{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-    LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
+    boost::shared_ptr<LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>>
     CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false, const string rowLabelInputFormat = "");
 
     // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
@@ -107,7 +107,7 @@ namespace {
 
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrixFactory::
+boost::shared_ptr<LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>> LMatrixFactory::
 CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels, const string rowLabelInputFormat){
     
     // This is a simple labelled matrix implementation that is not optimised for speed.
@@ -136,7 +136,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
         colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
 
         // Call constructor (Validation is done inside constructor)
-        return LM(rawData, rowNames, colNames);
+        return boost::shared_ptr<LM>(new LM(rawData, rowNames, colNames));
     }
 
     // Assuming there are row and/or col labels, we need a file handler
@@ -166,8 +166,7 @@ CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, con
 
 
     // Finally, call the LMatrix constructor (Validation is done inside constructor)
-    return LM(rawData, rowNames, colNames);
-
+    return boost::shared_ptr<LM> (new LM(rawData, rowNames, colNames) );
 
     //ASK: Can I avoid returning by value in this function?
 

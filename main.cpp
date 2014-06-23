@@ -10,7 +10,7 @@
 #include "boost/date_time/local_time/local_time.hpp"
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "boost/date_time/gregorian/gregorian.hpp"
-
+#include "boost/shared_ptr.hpp"
 #include "TimeSeriesFactory.h"
 #include "LMatrix.h"
 #include "TimeSeries.h"
@@ -35,23 +35,18 @@ int main(int argc, const char * argv[])
 {
 
     //TimeSeries
-    TS ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
-    cout<<ts<<endl;
+    boost::shared_ptr<TS> ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
+    cout<<*ts<<endl;
 
-    ptime t(date(2014, 6, 5));
-    cout<<t<<endl;
-    TS tmp = ts.row(t);
-    cout<<tmp<<endl;
 
-    const size_t idx = 1;
-    TS tmp2 = ts.row(idx);
-    cout<<tmp2<<endl;
-
-    TS tmp3 = ts.col(string("GSPC.High"));
-    cout<<tmp3<<endl;
-
-    TS tmp4 = ts.col(idx);
-    cout<<tmp4<<endl;
+//    vector<ptime> a({ptime(date(2012, 3, 1)), ptime(date(2009, 1, 1)), ptime(date(2001, 1, 1))});
+//    DateTimeLabels sa(a);
+//    vector<ptime> b({ptime(date(2014, 5, 1)), ptime(date(2005, 5, 1)), ptime(date(2009, 1, 1))});
+//    DateTimeLabels sb(b);
+//
+//    DateTimeLabels tmp;
+//    tmp = intersect(sa, sb);
+//    cout<<tmp<<endl;
 
     return 0;
     //return igloo::TestRunner::RunAllTests();

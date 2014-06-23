@@ -25,17 +25,49 @@ public:
     virtual ~StringLabels(){};
 
     // General Utils
+    StringLabels& operator= (const StringLabels& otherObj);
     virtual vector<string> to_string() const {return itsData;}
     virtual size_t find(const string& str) const ;
     virtual void SetDefaultLabels(const string& str, const size_t& len);
     virtual void swap(StringLabels& rhs);
-    virtual StringLabels& operator= (const StringLabels& otherObj);
 
 
-private:
-    string itsInputFormat;
+    // Friends
+    friend ostream& operator<< (ostream& stream, StringLabels& rhs);
+    friend StringLabels join(const StringLabels& LHS, const StringLabels& RHS);
+    friend StringLabels intersect(const StringLabels& LHS, const StringLabels& RHS, const bool flagSort);
 
 };
+
+
+
+ostream&
+operator<< (ostream& stream, StringLabels& rhs) {
+    stream<<rhs.itsData;
+    return stream;
+}
+
+StringLabels
+join(const StringLabels& LHS, const StringLabels& RHS){
+    vector<string> result(LHS.itsData);
+    result.insert(result.end(), RHS.itsData.begin(), RHS.itsData.end());
+    return StringLabels(result);
+}
+
+
+StringLabels
+intersect(const StringLabels& LHS, const StringLabels& RHS, const bool flagSort){
+    StringLabels joinedData = join(LHS, RHS);
+    vector<string> rawData = joinedData.itsData;
+
+    // sort the labels otherwise uniwue() won't work properly
+    std::sort(rawData.begin(), rawData.end());
+    vector<string>::iterator it = unique(rawData.begin(), rawData.end());
+    rawData.resize(distance(rawData.begin(), it));
+
+    return(StringLabels(rawData));
+}
+
 
 
 
@@ -64,6 +96,7 @@ SetDefaultLabels(const string& str, const size_t& len){
     }
     SetData(result);
 }
+
 
 void StringLabels::
 swap(StringLabels& rhs){

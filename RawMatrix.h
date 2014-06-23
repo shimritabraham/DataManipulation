@@ -47,11 +47,14 @@ public:
     T& operator() (const size_t& rowIdx, const size_t& colIdx);
 
     // Utils functions
-    template<class S>
-    friend ostream& operator<< (ostream& str,  RawMatrix<S>& mat);
     void ValidateObject() const;
     void SwapRows(const size_t& r1, const size_t& r2);
     void SwapCols(const size_t& c1, const size_t& c2);
+
+    // Friend Functions
+    template<class S>
+    friend ostream& operator<< (ostream& str,  RawMatrix<S>& mat);
+
 
 private:
     //ASK: would it be better to make this a shared_ptr to a vector of shared_ptr's instead? To speed it up.

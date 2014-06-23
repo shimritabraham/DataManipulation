@@ -21,7 +21,7 @@ class TimeSeries: public LMatrix<dataType, dtContainerType, dtElementType>{
 
 public:
     TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames);
-    TimeSeries(LM mat);
+    TimeSeries(boost::shared_ptr<LM> mat);
     TimeSeries():LM(){};
     ~TimeSeries(){};
 
@@ -100,7 +100,7 @@ TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colN
 
 template <class dataType, class dtContainerType, class dtElementType>
 TimeSeries<dataType, dtContainerType, dtElementType>::
-TimeSeries(LMatrix<dataType, dtContainerType, dtElementType> mat): LMatrix<dataType, dtContainerType, dtElementType>(mat){
+TimeSeries(boost::shared_ptr<LMatrix<dataType, dtContainerType, dtElementType>> mat): LMatrix<dataType, dtContainerType, dtElementType>(mat){
 
     ValidateObject();
 }

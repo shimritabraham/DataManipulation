@@ -36,10 +36,42 @@ public:
     virtual void swap(const DateTimeLabels& rhs);
     virtual DateTimeLabels& operator=(const DateTimeLabels& rhs);
 
+
+    // Friends
     friend ostream& operator<< (ostream& stream, DateTimeLabels& rhs) ;
+    friend DateTimeLabels join(const DateTimeLabels& LHS, const DateTimeLabels& RHS);
+    friend DateTimeLabels intersect(const DateTimeLabels& LHS, const DateTimeLabels& RHS);
+
 };
 
 
+
+DateTimeLabels
+intersect(const DateTimeLabels& LHS, const DateTimeLabels& RHS){
+    DateTimeLabels joinedData = join(LHS, RHS);
+    vector<pt> rawData = joinedData.itsData;
+
+    // sort the labels first, otherwise unique() won't work properly
+    std::sort(rawData.begin(), rawData.end());
+
+    vector<pt>::iterator it = unique(rawData.begin(), rawData.end());
+    rawData.resize(distance(rawData.begin(), it));
+
+    return(DateTimeLabels(rawData));
+}
+
+DateTimeLabels
+join(const DateTimeLabels& LHS, const DateTimeLabels& RHS){
+    vector<pt> result(LHS.itsData);
+    result.insert(result.end(), RHS.itsData.begin(), RHS.itsData.end());
+    return DateTimeLabels(result);
+}
+
+ostream&
+operator<< (ostream& stream, DateTimeLabels& rhs) {
+    stream<<rhs.itsData;
+    return stream;
+}
 
 
 vector<string> DateTimeLabels::

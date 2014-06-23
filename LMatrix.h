@@ -38,7 +38,7 @@ public:
 
     // Note: LMatrix objects should be created via Factory functions, not via the constructor
     LMatrix(RawMatrix<dataType>& rawData, rowLabelCollectionType& rowNames, strVec& colNames);
-    LMatrix(const LM& mat);
+    LMatrix(const boost::shared_ptr<LM> mat);
     LMatrix();
     ~LMatrix(){};
 
@@ -97,7 +97,6 @@ public:
     template<class dt, class rlct, class rlet>
     friend ostream& operator<< (ostream& str,  LMatrix<dt, rlct, rlet>& mat);
 
-
 protected:
     bool is_sorted() const {return itsRowLabels.is_sorted();}
     bool is_unique() const {return itsRowLabels.is_unique();}
@@ -112,6 +111,11 @@ protected:
     rowLabelCollectionType itsRowLabels;
     strVec itsColLabels;
 };
+
+
+// Non-member functions
+LMatrix<class dataType, class dtContainerType, class dtElementType>
+Intersect(const LMatrix<dataType, dtContainerType, dtElementType>& ts1, const LMatrix<dataType, dtContainerType, dtElementType>& ts2);
 
 
 
@@ -215,6 +219,18 @@ namespace{
 }
 
 
+//template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+//LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
+//join(
+//     const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& LHS,
+//     const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& RHS){
+//
+//
+//
+//
+//}
+
+
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 LMatrix(){
@@ -225,10 +241,10 @@ LMatrix(){
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
-LMatrix(const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& mat){
-    itsRawData = mat.itsRawData;
-    itsColLabels = mat.itsColLabels;
-    itsRowLabels =mat.itsRowLabels;
+LMatrix(const boost::shared_ptr<LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>> mat){
+    itsRawData = mat->itsRawData;
+    itsColLabels = mat->itsColLabels;
+    itsRowLabels =mat->itsRowLabels;
 }
 
 
@@ -577,6 +593,18 @@ col(const size_t& idx) const {
 
     return LMatrix(RM, itsRowLabels, colLabels);
 }
+
+
+
+//LMatrix<class dataType, class dtContainerType, class dtElementType>
+//Intersect(const LMatrix<dataType, dtContainerType, dtElementType>& ts1, const LMatrix<dataType, dtContainerType, dtElementType>& ts2){
+//
+//}
+
+
+
+
+
 #endif
 
 
