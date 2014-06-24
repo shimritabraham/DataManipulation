@@ -35,8 +35,8 @@ int main(int argc, const char * argv[])
 {
 
     //TimeSeries
-    boost::shared_ptr<TS> ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
-    cout<<*ts<<endl;
+//    boost::shared_ptr<TS> ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
+//    cout<<*ts<<endl;
 
 
 //    vector<ptime> a({ptime(date(2012, 3, 1)), ptime(date(2009, 1, 1)), ptime(date(2001, 1, 1))});
@@ -47,6 +47,17 @@ int main(int argc, const char * argv[])
 //    DateTimeLabels tmp;
 //    tmp = intersect(sa, sb);
 //    cout<<tmp<<endl;
+
+
+    vector<string> a{"zz", "aa"};
+    StringLabels sa(a);
+
+    vector<string> b{"bb", "aa"};
+    StringLabels sb(b);
+
+    StringLabels sc = sa.intersect(sb);
+
+    cout<<sc<<endl;
 
     return 0;
     //return igloo::TestRunner::RunAllTests();

@@ -11,17 +11,22 @@
 #include <vector>
 #include <string>
 #include "LabelContainer.h"
+#include "boost/shared_ptr.hpp"
 
 using namespace std;
 
 
 class StringLabels:public LabelContainer<string>{
 public:
+    typedef LabelContainer<string> LC;
+    typedef boost::shared_ptr<StringLabels> pSLabels;
 
     // Con/De-structors
-    StringLabels(vector<string> data):LabelContainer<string>(data){}
-    StringLabels():LabelContainer<string>(){}
-    StringLabels(const StringLabels& otherObj):LabelContainer<string>(otherObj.itsData){};
+    StringLabels():LC(){}
+    StringLabels(const StringLabels& otherObj):LC(otherObj.itsData){}
+    StringLabels(const vector<string> vec):LC(vec){}
+    StringLabels(const LC otherObj):LC(otherObj){}
+    StringLabels(const boost::shared_ptr<LC> otherObj):LC(*otherObj){}
     virtual ~StringLabels(){};
 
     // General Utils
@@ -30,12 +35,12 @@ public:
     virtual size_t find(const string& str) const ;
     virtual void SetDefaultLabels(const string& str, const size_t& len);
     virtual void swap(StringLabels& rhs);
+    StringLabels join(const StringLabels& rhs) const;
+    StringLabels intersect(const StringLabels& rhs)const;
 
 
     // Friends
     friend ostream& operator<< (ostream& stream, StringLabels& rhs);
-    friend StringLabels join(const StringLabels& LHS, const StringLabels& RHS);
-    friend StringLabels intersect(const StringLabels& LHS, const StringLabels& RHS, const bool flagSort);
 
 };
 
@@ -47,20 +52,21 @@ operator<< (ostream& stream, StringLabels& rhs) {
     return stream;
 }
 
-StringLabels
-join(const StringLabels& LHS, const StringLabels& RHS){
-    vector<string> result(LHS.itsData);
-    result.insert(result.end(), RHS.itsData.begin(), RHS.itsData.end());
-    return StringLabels(result);
+
+StringLabels StringLabels::
+join(const StringLabels& rhs) const{
+    vector<string> allData(itsData);
+    allData.insert(allData.end(), rhs.itsData.begin(), rhs.itsData.end());
+    return StringLabels(allData);
 }
 
 
-StringLabels
-intersect(const StringLabels& LHS, const StringLabels& RHS, const bool flagSort){
-    StringLabels joinedData = join(LHS, RHS);
+StringLabels StringLabels::
+intersect(const StringLabels& rhs) const{
+    StringLabels joinedData = this->join(rhs);
     vector<string> rawData = joinedData.itsData;
 
-    // sort the labels otherwise uniwue() won't work properly
+    // sort the labels otherwise unique() won't work properly
     std::sort(rawData.begin(), rawData.end());
     vector<string>::iterator it = unique(rawData.begin(), rawData.end());
     rawData.resize(distance(rawData.begin(), it));

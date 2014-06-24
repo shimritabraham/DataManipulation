@@ -14,6 +14,7 @@
 #include <boost/shared_ptr.hpp>
 
 using namespace std;
+using namespace boost;
 
 
 template<class elementType>
@@ -67,7 +68,6 @@ protected:
 //---------------------------------------------
 // Function Definitions
 //---------------------------------------------
-
 
 
 
