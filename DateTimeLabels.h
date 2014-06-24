@@ -35,6 +35,8 @@ public:
     virtual void SetDefaultLabels(const string& str, const size_t& len);
     virtual void swap(const DateTimeLabels& rhs);
     virtual DateTimeLabels& operator=(const DateTimeLabels& rhs);
+    DateTimeLabels join(const DateTimeLabels& rhs) const;
+    DateTimeLabels intersect(const DateTimeLabels& rhs) const;
 
 
     // Friends
@@ -46,9 +48,11 @@ public:
 
 
 
-DateTimeLabels
-intersect(const DateTimeLabels& LHS, const DateTimeLabels& RHS){
-    DateTimeLabels joinedData = join(LHS, RHS);
+
+
+DateTimeLabels DateTimeLabels::
+intersect(const DateTimeLabels& rhs) const{
+    DateTimeLabels joinedData = this->join(rhs);
     vector<pt> rawData = joinedData.itsData;
 
     // sort the labels first, otherwise unique() won't work properly
@@ -60,10 +64,10 @@ intersect(const DateTimeLabels& LHS, const DateTimeLabels& RHS){
     return(DateTimeLabels(rawData));
 }
 
-DateTimeLabels
-join(const DateTimeLabels& LHS, const DateTimeLabels& RHS){
-    vector<pt> result(LHS.itsData);
-    result.insert(result.end(), RHS.itsData.begin(), RHS.itsData.end());
+DateTimeLabels DateTimeLabels::
+join(const DateTimeLabels& rhs) const{
+    vector<pt> result(itsData);
+    result.insert(result.end(), rhs.itsData.begin(), rhs.itsData.end());
     return DateTimeLabels(result);
 }
 

@@ -39,25 +39,25 @@ int main(int argc, const char * argv[])
 //    cout<<*ts<<endl;
 
 
-//    vector<ptime> a({ptime(date(2012, 3, 1)), ptime(date(2009, 1, 1)), ptime(date(2001, 1, 1))});
-//    DateTimeLabels sa(a);
-//    vector<ptime> b({ptime(date(2014, 5, 1)), ptime(date(2005, 5, 1)), ptime(date(2009, 1, 1))});
-//    DateTimeLabels sb(b);
+    vector<ptime> a({ptime(date(2012, 3, 1)), ptime(date(2009, 1, 1)), ptime(date(2001, 1, 1))});
+    DateTimeLabels sa(a);
+    vector<ptime> b({ptime(date(2014, 5, 1)), ptime(date(2005, 5, 1)), ptime(date(2009, 1, 1))});
+    DateTimeLabels sb(b);
+
+    DateTimeLabels tmp;
+    tmp = sa.intersect(sb);
+    cout<<tmp<<endl;
+
+
+//    vector<string> a{"zz", "aa"};
+//    StringLabels sa(a);
 //
-//    DateTimeLabels tmp;
-//    tmp = intersect(sa, sb);
-//    cout<<tmp<<endl;
-
-
-    vector<string> a{"zz", "aa"};
-    StringLabels sa(a);
-
-    vector<string> b{"bb", "aa"};
-    StringLabels sb(b);
-
-    StringLabels sc = sa.intersect(sb);
-
-    cout<<sc<<endl;
+//    vector<string> b{"bb", "aa"};
+//    StringLabels sb(b);
+//
+//    StringLabels sc = sa.intersect(sb);
+//
+//    cout<<sc<<endl;
 
     return 0;
     //return igloo::TestRunner::RunAllTests();
