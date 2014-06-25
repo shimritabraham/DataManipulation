@@ -24,17 +24,22 @@ class RawMatrix{
     // FIXME: Initially, this class uses a vector of vectors to store matrix data. This can be enhanced to gain more speed later.
 
 public:
+    typedef boost::shared_ptr<RawMatrix<T>> pRM;
+    typedef RawMatrix<T> RM;
 
+    //<##>
     // Con/Destructors
     RawMatrix(const string& fileName);
     RawMatrix(istream& ifstream);
     RawMatrix(const boost::shared_ptr <vector<vector<T>>>& pData);
     RawMatrix();
+    RawMatrix(const size_t& nRows);
     ~RawMatrix(){};
 
     // accessors
     size_t GetNrCols() const {return ((*itsPRawMatrixData)[0]).size();};
     size_t GetNrRows() const {return (*itsPRawMatrixData).size();};
+    pRM GetSubsetOfRows(const vector<size_t> rowIndices) const;
 
     //ASK: return type is ref in row() and non-ref in col(). Can this be avoided?
     const vector<T>& row(const size_t& idx) const {return (*itsPRawMatrixData)[idx];}
@@ -50,6 +55,8 @@ public:
     void ValidateObject() const;
     void SwapRows(const size_t& r1, const size_t& r2);
     void SwapCols(const size_t& c1, const size_t& c2);
+    void AppendToRow(const vector<T> vec, size_t idx);
+    pRM cbind(const pRM rhs) const;
 
     // Friend Functions
     template<class S>
@@ -106,6 +113,62 @@ namespace{
     }
     
 }
+
+template<class T>
+boost::shared_ptr<RawMatrix<T>> RawMatrix<T>::
+GetSubsetOfRows(const vector<size_t> rowIndices) const{
+    pRM result(new RawMatrix<T>());
+    for(size_t i=0; i<rowIndices.size(); i++){
+        result->row(i) = this->row(rowIndices[i]);
+    }
+    result->ValidateObject();
+    return result;
+}
+
+
+template<class T>
+void RawMatrix<T>::
+AppendToRow(const vector<T> vec, size_t idx){
+    typename vector<T>::const_iterator it = row(idx).end();
+    row(idx).insert(it, vec.begin(), vec.end());
+}
+
+
+
+template<class T>
+boost::shared_ptr<RawMatrix<T>>  RawMatrix<T>::
+cbind(const pRM rhs) const{
+    // ASK: How do I check that the matrix elements are of the same type? or is that already guaranteed?
+
+    size_t nRows = GetNrRows();
+
+    // check that both matrices have the same nr of rows
+    if(nRows != rhs->GetNrRows()){
+        throw string("ERROR:\tUnable to join two raw matrices with unequal nr of rows")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
+
+    // make sure there is at least one row to join
+    if(nRows == 0){
+        throw string("ERROR:\tZero rows to join. Not implemented yet")+
+        string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
+    }
+
+    RM lhs = *this;
+
+    // join each row
+    pRM result(new RM(nRows));
+    for(size_t i=0; i<nRows; i++){
+        result->row(i) = row(i);
+        result->AppendToRow(rhs->row(i), i);
+    }
+
+    // Sanity check
+    result->ValidateObject();
+
+    return result;
+}
+
 
 
 template<class T>
@@ -197,6 +260,13 @@ RawMatrix(){
     // Problem: I need this constructor elsewhere (do I really?)
 }
 
+//<##>
+template<class T>
+RawMatrix<T>::
+RawMatrix(const size_t& nRows){
+    itsPRawMatrixData = boost::shared_ptr<vector<vector<T>>>(new vector<vector<T>>);
+    itsPRawMatrixData->resize(nRows);
+}
 
 template<class T>
 RawMatrix<T>::

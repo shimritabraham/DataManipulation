@@ -16,18 +16,23 @@ template<class dataType, class dtContainerType, class dtElementType>
 class TimeSeries: public LMatrix<dataType, dtContainerType, dtElementType>{
     // a TimeSeries object is a special kind of Labelled Matrix where the rownames represent timestamps
 
-    typedef LMatrix<dataType, dtContainerType, dtElementType> LM;
-    typedef TimeSeries <dataType, dtContainerType, dtElementType> TS;
 
 public:
-    TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames);
+
+    // Typedefs
+    typedef LMatrix<dataType, dtContainerType, dtElementType> LM;
+    typedef TimeSeries <dataType, dtContainerType, dtElementType> TS;
+    typedef boost::shared_ptr<TS> pTS;
+
+
+    // Con/Destructors
+    TimeSeries(const RawMatrix<dataType>& rawData, const dtContainerType& rowNames, const strVec& colNames);
     TimeSeries(boost::shared_ptr<LM> mat);
+    TimeSeries(const LM& mat):LM(mat){}
     TimeSeries():LM(){};
     ~TimeSeries(){};
 
-
     // Accessor functions
-    // FIXME: finish defining row() and col() for TS
     const TS row(const dtElementType& name) const {return TimeSeries(LM::row(name));}
           TS row(const dtElementType& name)       {return TimeSeries(LM::row(name));}
     const TS row(const size_t& idx)         const {return TimeSeries(LM::row(idx));}
@@ -38,12 +43,11 @@ public:
     const TS col(const size_t& idx) const   {return TimeSeries(LM::col(idx));}
           TS col(const size_t& idx)         {return TimeSeries(LM::col(idx));}
 
-
-
     // Util functions:
     void ValidateObject() const;
     bool is_sorted()      const{return LM::is_sorted();}
     bool is_unique()      const{return LM::is_unique();}
+//    virtual pTS cbind(const pTS rhs) const;
 
 };
 
@@ -65,6 +69,14 @@ Union(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const Tim
 //--------------------------------------------------------------------------------------------------
 // --------------------------- Function Definitions ------------------------------------------------
 //--------------------------------------------------------------------------------------------------
+
+
+//template<class dateType, class dtContainerType, class dtElementType>
+//boost::shared_ptr<TimeSeries<dateType, dtContainerType, dtElementType>> TimeSeries<dateType, dtContainerType, dtElementType>::
+//cbind(const pTS rhs) const{
+//
+//}
+
 
 template<class dateType, class dtContainerType, class dtElementType>
 void TimeSeries<dateType, dtContainerType, dtElementType>::
@@ -91,7 +103,7 @@ ValidateObject() const {
 
 template <class dataType, class dtContainerType, class dtElementType>
 TimeSeries<dataType, dtContainerType, dtElementType>::
-TimeSeries(RawMatrix<dataType>& rawData, dtContainerType& rowNames, strVec& colNames):
+TimeSeries(const RawMatrix<dataType>& rawData, const dtContainerType& rowNames, const strVec& colNames):
         LMatrix<dataType, dtContainerType, dtElementType>(rawData, rowNames, colNames){
 
     ValidateObject();

@@ -30,34 +30,29 @@ using namespace std;
 
 
 typedef TimeSeries<double, DateTimeLabels, ptime> TS;
+typedef boost::shared_ptr<TimeSeries<double, DateTimeLabels, ptime>> pTS;
+typedef boost::shared_ptr<LMatrix<double, DateTimeLabels, ptime>> pLM;
+
+
+
+
+
 
 int main(int argc, const char * argv[])
 {
 
     //TimeSeries
-//    boost::shared_ptr<TS> ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
-//    cout<<*ts<<endl;
+    boost::shared_ptr<TS> ts1 = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
+    boost::shared_ptr<TS> ts2 = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GDAXI_dateChg.csv", "%Y-%m-%d", true);
+
+    pTS pts1(new TS (ts1->col("GSPC.Close")));
+    pTS pts2(new TS (ts1->col("GSPC.Open")));
 
 
-    vector<ptime> a({ptime(date(2012, 3, 1)), ptime(date(2009, 1, 1)), ptime(date(2001, 1, 1))});
-    DateTimeLabels sa(a);
-    vector<ptime> b({ptime(date(2014, 5, 1)), ptime(date(2005, 5, 1)), ptime(date(2009, 1, 1))});
-    DateTimeLabels sb(b);
+    pLM a = pts1->cbind(pts2);
+    a->head(cout, 3);
+    a->tail(cout, 3);
 
-    DateTimeLabels tmp;
-    tmp = sa.intersect(sb);
-    cout<<tmp<<endl;
-
-
-//    vector<string> a{"zz", "aa"};
-//    StringLabels sa(a);
-//
-//    vector<string> b{"bb", "aa"};
-//    StringLabels sb(b);
-//
-//    StringLabels sc = sa.intersect(sb);
-//
-//    cout<<sc<<endl;
 
     return 0;
     //return igloo::TestRunner::RunAllTests();

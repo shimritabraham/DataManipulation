@@ -13,9 +13,11 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <utility>
 #include <iomanip>
 #include <iterator>
+#include <algorithm>
 #include "FileInputManager.h"
 #include "RawMatrix.h"
 #include "boost/shared_ptr.hpp"
@@ -31,16 +33,18 @@ class LMatrix{
 public:
 
     typedef LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LM;
+    typedef boost::shared_ptr<LM> pLM;
+    typedef boost::shared_ptr<RawMatrix<dataType>> pRM;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Con/De structors ~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Note: LMatrix objects should be created via Factory functions, not via the constructor
-    LMatrix(RawMatrix<dataType>& rawData, rowLabelCollectionType& rowNames, strVec& colNames);
+    LMatrix(const RawMatrix<dataType>& rawData, const rowLabelCollectionType& rowNames, const strVec& colNames);
     LMatrix(const boost::shared_ptr<LM> mat);
     LMatrix();
-    ~LMatrix(){};
+    virtual ~LMatrix(){};
 
 
 
@@ -92,6 +96,10 @@ public:
     void SwapRows(const rowLabelElementType& str1, const rowLabelElementType& str2);
     void SwapCols(const size_t& c1, const size_t& c2);
     void SwapCols(const string& str1, const string& str2);
+    ostream& head(ostream& stream, const size_t =5)const;
+    ostream& tail(ostream& stream, const size_t =5)const;
+    virtual pLM cbind(const pLM rhs) const;
+
 
     // Friends
     template<class dt, class rlct, class rlet>
@@ -110,14 +118,14 @@ protected:
     RawMatrix<dataType> itsRawData;  // this can potentially be templetized later
     rowLabelCollectionType itsRowLabels;
     strVec itsColLabels;
+
+    // ASK: Ideally, these parameters should live in some config file. How do I do this?
+    const int fieldWidth = 20;
+    const size_t maxCols = 4;
+    const size_t maxRows = 10;
+    const int precision = 8;
+
 };
-
-
-// Non-member functions
-LMatrix<class dataType, class dtContainerType, class dtElementType>
-Intersect(const LMatrix<dataType, dtContainerType, dtElementType>& ts1, const LMatrix<dataType, dtContainerType, dtElementType>& ts2);
-
-
 
 
 
@@ -127,8 +135,9 @@ namespace{
     // Function Declarations
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
     void PrintSmallLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth);
+
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-    void PrintLargeLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth, const int& maxRows, const int& maxCols);
+    void PrintLargeLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth, const size_t& maxRows, const size_t& maxCols, const bool printHead = true, const bool printTail = true);
 
 
     // Function Definitions
@@ -156,13 +165,14 @@ namespace{
         }
         
     }
-
+//<##>
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-    void PrintLargeLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth, const size_t& maxRows, const size_t& maxCols){
+    void PrintLargeLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth, const size_t& maxRows, const size_t& maxCols, const bool printHead, const bool printTail){
 
         size_t nRows = mat.GetNrRows();
         size_t nCols = mat.GetNrCols();
+        size_t startEndColIdx = std::max<size_t>(nCols-maxCols/2-1, maxCols/2); // needed for when there are not many columns
 
         // print colnames
         strVec colnames = mat.GetColLabels();
@@ -172,63 +182,108 @@ namespace{
         }
         if(nCols>maxCols)
             cout<<setw(fieldWidth)<<"...";
-        for (size_t i=nCols-maxCols/2-1; i<nCols; i++){
+        for (size_t i=startEndColIdx; i<nCols; i++){
             cout<<setw(fieldWidth)<<right<<colnames[i];
         }
         cout<<endl;
 
+        size_t printRows;
+        if(printHead && printTail){
+             printRows = maxRows/2;
+        }else{
+            printRows = maxRows;
+        }
 
-        // print the head of the matrix
         strVec rownames = mat.GetRowLabels().to_string();
-        for (size_t i=0; i<maxRows/2; i++){
-            cout<<setw(fieldWidth)<<right<<rownames[i];
-            for (size_t j=0; j<maxCols/2; j++){
-                str<<setw(fieldWidth)<<right<<mat(i, j);
-            }
-            if(nCols>maxCols)
-                cout<<setw(fieldWidth)<<"...";
-            for (size_t j=nCols-maxCols/2-1; j<nCols; j++){
-                str<<setw(fieldWidth)<<right<<mat(i, j);
-            }
+        // print the head of the matrix
+        if(printHead){
+            for (size_t i=0; i<printRows; i++){
+                cout<<setw(fieldWidth)<<right<<rownames[i];
+                for (size_t j=0; j<maxCols/2; j++){
+                    str<<setw(fieldWidth)<<right<<mat(i, j);
+                }
+                if(nCols>maxCols)
+                    cout<<setw(fieldWidth)<<"...";
+                for (size_t j=startEndColIdx; j<nCols; j++){
+                    str<<setw(fieldWidth)<<right<<mat(i, j);
+                }
 
-            str<<endl;
+                str<<endl;
+            }
         }
 
-
-        if(nRows>maxRows){
-            cout<<"."<<endl;
-            cout<<"."<<endl;
-            cout<<"."<<endl;
-        }
-
-        // print the tail of the matrix
-        for (size_t i=nRows-maxRows/2-1; i<nRows; i++){
-            cout<<setw(fieldWidth)<<right<<rownames[i];
-            for (size_t j=0; j<maxCols/2; j++){
-                str<<setw(fieldWidth)<<right<<mat(i, j);
+        if(printTail){
+            if(nRows>maxRows){
+                cout<<"."<<endl;
+                cout<<"."<<endl;
+                cout<<"."<<endl;
             }
-            if(nCols>maxCols)
-                cout<<setw(fieldWidth)<<"...";
-            for (size_t j=nCols-maxCols/2-1; j<nCols; j++){
-                str<<setw(fieldWidth)<<right<<mat(i, j);
+
+            // print the tail of the matrix
+            for (size_t i=nRows-printRows-1; i<nRows; i++){
+                cout<<setw(fieldWidth)<<right<<rownames[i];
+                for (size_t j=0; j<maxCols/2; j++){
+                    str<<setw(fieldWidth)<<right<<mat(i, j);
+                }
+                if(nCols>maxCols)
+                    cout<<setw(fieldWidth)<<"...";
+                for (size_t j=startEndColIdx; j<nCols; j++){
+                    str<<setw(fieldWidth)<<right<<mat(i, j);
+                }
+                str<<endl;
             }
-            str<<endl;
         }
 
     }
 }
 
 
-//template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-//LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
-//join(
-//     const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& LHS,
-//     const LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& RHS){
-//
-//
-//
-//
-//}
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+boost::shared_ptr<  LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>  >
+LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+cbind(const pLM rhs) const {
+
+    vector<string> newColLabels(itsColLabels);
+    newColLabels.insert(newColLabels.end(),rhs->itsColLabels.begin(), rhs->itsColLabels.end());
+
+
+    // simple case: labels of both objects are identical
+    if (itsRowLabels.equal(rhs->itsRowLabels)){
+
+        //  join the raw data
+        pRM pRhsData(new RawMatrix<dataType> (rhs->itsRawData));
+        pRM pJoinedRawData = itsRawData.cbind(pRhsData);
+
+        // return a ptr to a new LMatrix object
+        LM tmp =LM(*pJoinedRawData, itsRowLabels, newColLabels);
+        return pLM(new LM(*pJoinedRawData, itsRowLabels, newColLabels));
+    }
+
+    // FIXME: finish this!
+    // Join and sort the rowlabels from both objects
+    rowLabelCollectionType newRowLabels = itsRowLabels.intersect(rhs->itsRowLabels);
+
+
+    // select the right rows from lhs and rhs objects
+    vector<size_t> rLabelIndices_lhs;
+    vector<size_t> rLabelIndices_rhs;
+    for(size_t i=0; i<newRowLabels.size(); i++){
+        rLabelIndices_lhs.push_back(itsRowLabels.find(newRowLabels[i]));
+        rLabelIndices_rhs.push_back(rhs->itsRowLabels.find(newRowLabels[i]));
+    }
+    pRM pRawData_lhs = itsRawData.GetSubsetOfRows(rLabelIndices_lhs);
+    pRM pRawData_rhs = rhs->itsRawData.GetSubsetOfRows(rLabelIndices_rhs);
+
+    // join the data
+    pRM pJoinedRawData = pRawData_lhs->cbind(pRawData_rhs);
+
+    // return a ptr to a new LMatrix object
+    return pLM(new LM(*pJoinedRawData, newRowLabels, newColLabels));
+
+
+}
+
+
 
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
@@ -331,7 +386,7 @@ SwapCols(const size_t &c1, const size_t &c2){
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
-LMatrix(RawMatrix<dataType>& rawData, rowLabelCollectionType& rowNames, strVec& colNames):
+LMatrix(const RawMatrix<dataType>& rawData, const rowLabelCollectionType& rowNames, const strVec& colNames):
     itsRawData(rawData), itsRowLabels(rowNames), itsColLabels(colNames)
 {
     ValidateObject();
@@ -380,32 +435,62 @@ operator() (const rowLabelElementType& rowName, const std::string& colName){
 
 
 
+
+
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 ostream& operator<< (ostream& str,  LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>& mat){
 
-
-
-    // ASK: Ideally, these parameters should live in some config file. How do I do this?
-    const int& fieldWidth = 20;
-    const size_t& maxCols = 4;
-    const size_t& maxRows = 10;
-    const int& precision = 8;
-
-
     size_t nRows = mat.GetNrRows();
     size_t nCols = mat.GetNrCols();
-    str<<"Raw Data "<<"("<<nRows<<"x"<<nCols<<"):"<<endl<<endl;
+    str<<"Matrix "<<"("<<nRows<<"x"<<nCols<<"):"<<endl<<endl;
 
-    str<<setprecision(precision);
-    if(nRows<=maxRows && nCols<=maxCols){
-        PrintSmallLMatrix(str, mat, fieldWidth);
+    str<<setprecision(mat.precision);
+    if(nRows<=mat.maxRows && nCols<=mat.maxCols){
+        PrintSmallLMatrix(str, mat, mat.fieldWidth);
     }else{
-        size_t adjMaxRows = std::min<size_t>(maxRows, nRows);
-        size_t adjMaxCols = std::min<size_t>(maxCols, nCols);
-        PrintLargeLMatrix(str, mat, fieldWidth, adjMaxRows, adjMaxCols);
+        size_t adjMaxRows = std::min<size_t>(mat.maxRows, nRows);
+        size_t adjMaxCols = std::min<size_t>(mat.maxCols, nCols);
+        PrintLargeLMatrix(str, mat, mat.fieldWidth, adjMaxRows, adjMaxCols);
     }
 
     return str;
+}
+
+
+//<##>
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+ostream& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+head(ostream& stream, const size_t n)const{
+
+    size_t nRows = this->GetNrRows();
+    size_t nCols = this->GetNrCols();
+
+    stream<<"Matrix "<<"("<<nRows<<"x"<<nCols<<"):"<<endl<<endl;
+    stream<<setprecision(precision);
+    size_t adjMaxRows = std::min<size_t>(n, nRows);
+    size_t adjMaxCols = std::min<size_t>(maxCols, nCols);
+
+    PrintLargeLMatrix(stream, *this, fieldWidth, adjMaxRows, adjMaxCols, true, false);
+
+    return stream;
+}
+
+
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+ostream& LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
+tail(ostream& stream, const size_t n)const{
+    size_t nRows = this->GetNrRows();
+    size_t nCols = this->GetNrCols();
+
+    stream<<"Matrix "<<"("<<nRows<<"x"<<nCols<<"):"<<endl<<endl;
+    stream<<setprecision(precision);
+    size_t adjMaxRows = std::min<size_t>(n, nRows);
+    size_t adjMaxCols = std::min<size_t>(maxCols, nCols);
+
+    PrintLargeLMatrix(stream, *this, fieldWidth, adjMaxRows, adjMaxCols, false, true);
+
+    return stream;
+
 }
 
 

@@ -12,6 +12,7 @@
 #include <string>
 #include "LabelContainer.h"
 #include "boost/shared_ptr.hpp"
+#include "Utils.h"
 
 using namespace std;
 
@@ -61,21 +62,28 @@ join(const StringLabels& rhs) const{
 }
 
 
+//StringLabels StringLabels::
+//intersect(const StringLabels& rhs) const{
+//    StringLabels joinedData = this->join(rhs);
+//    vector<string> rawData = joinedData.itsData;
+//
+//    // sort the labels otherwise unique() won't work properly
+//    std::sort(rawData.begin(), rawData.end());
+//    vector<string>::iterator it = unique(rawData.begin(), rawData.end());
+//    rawData.resize(distance(rawData.begin(), it));
+//
+//    return(StringLabels(rawData));
+//}
+
 StringLabels StringLabels::
 intersect(const StringLabels& rhs) const{
-    StringLabels joinedData = this->join(rhs);
-    vector<string> rawData = joinedData.itsData;
-
-    // sort the labels otherwise unique() won't work properly
-    std::sort(rawData.begin(), rawData.end());
-    vector<string>::iterator it = unique(rawData.begin(), rawData.end());
-    rawData.resize(distance(rawData.begin(), it));
-
-    return(StringLabels(rawData));
+//    vector<string> vec_lhs(itsData);
+//    vector<string> vec_rhs(rhs.itsData);
+//    utils::intersection(vec_lhs, vec_rhs);
+//    return StringLabels(utils::intersection(vec_lhs, vec_rhs));
+    StringLabels tmp;
+    return tmp;
 }
-
-
-
 
 size_t StringLabels::
 find(const string& str) const{

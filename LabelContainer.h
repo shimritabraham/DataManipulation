@@ -10,6 +10,7 @@
 #define DataManipulation_LabelContainer_h
 
 #include <vector>
+#include <algorithm>
 #include <set>
 #include <boost/shared_ptr.hpp>
 
@@ -42,6 +43,7 @@ public:
     virtual void swap(const LabelContainer& rhs);
     bool is_sorted() const{return std::is_sorted(itsData.begin(), itsData.end());}
     bool is_unique() const;
+    bool equal(const LabelContainer<elementType> rhs) const;
 
     // Pure virtual functions
     virtual vector<string> to_string() const = 0;
@@ -69,6 +71,23 @@ protected:
 // Function Definitions
 //---------------------------------------------
 
+
+template<class elementType>
+bool LabelContainer<elementType>::
+equal(const LabelContainer<elementType> rhs) const{
+
+    // check sizes of vectors
+    if(this->size() != rhs.size()){
+        return false;
+    }
+
+    // compare elements of underlying data
+    if(!std::equal(itsData.begin(), itsData.end(), rhs.itsData.begin())){
+        return false;
+    }
+
+    return true;
+}
 
 
 template<class elementType>

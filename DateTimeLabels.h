@@ -12,6 +12,7 @@
 #include "boost/date_time/local_time/local_time.hpp"
 #include <vector>
 #include "LabelContainer.h"
+#include "Utils.h"
 
 using namespace boost::posix_time;
 using namespace std;
@@ -48,8 +49,6 @@ public:
 
 
 
-
-
 DateTimeLabels DateTimeLabels::
 intersect(const DateTimeLabels& rhs) const{
     DateTimeLabels joinedData = this->join(rhs);
@@ -63,6 +62,16 @@ intersect(const DateTimeLabels& rhs) const{
 
     return(DateTimeLabels(rawData));
 }
+
+
+//DateTimeLabels DateTimeLabels::
+//intersect(const DateTimeLabels& rhs) const{
+//    vector<ptime> vec_lhs(itsData);
+//    vector<ptime> vec_rhs(rhs.itsData);
+//
+//    return DateTimeLabels(utils::intersection(vec_lhs, vec_rhs));
+//}
+
 
 DateTimeLabels DateTimeLabels::
 join(const DateTimeLabels& rhs) const{
