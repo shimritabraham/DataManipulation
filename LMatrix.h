@@ -212,13 +212,13 @@ namespace{
             }
         }
 
-        if(printTail){
-            if(nRows>maxRows){
-                cout<<"."<<endl;
-                cout<<"."<<endl;
-                cout<<"."<<endl;
-            }
+        if(nRows>maxRows){
+            cout<<"."<<endl;
+            cout<<"."<<endl;
+            cout<<"."<<endl;
+        }
 
+        if(printTail){
             // print the tail of the matrix
             for (size_t i=nRows-printRows-1; i<nRows; i++){
                 cout<<setw(fieldWidth)<<right<<rownames[i];
@@ -271,6 +271,7 @@ cbind(const pLM rhs) const {
         rLabelIndices_lhs.push_back(itsRowLabels.find(newRowLabels[i]));
         rLabelIndices_rhs.push_back(rhs->itsRowLabels.find(newRowLabels[i]));
     }
+    
     pRM pRawData_lhs = itsRawData.GetSubsetOfRows(rLabelIndices_lhs);
     pRM pRawData_rhs = rhs->itsRawData.GetSubsetOfRows(rLabelIndices_rhs);
 

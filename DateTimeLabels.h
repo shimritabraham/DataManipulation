@@ -49,28 +49,14 @@ public:
 
 
 
+
 DateTimeLabels DateTimeLabels::
 intersect(const DateTimeLabels& rhs) const{
-    DateTimeLabels joinedData = this->join(rhs);
-    vector<pt> rawData = joinedData.itsData;
+    vector<ptime> vec_lhs(itsData);
+    vector<ptime> vec_rhs(rhs.itsData);
 
-    // sort the labels first, otherwise unique() won't work properly
-    std::sort(rawData.begin(), rawData.end());
-
-    vector<pt>::iterator it = unique(rawData.begin(), rawData.end());
-    rawData.resize(distance(rawData.begin(), it));
-
-    return(DateTimeLabels(rawData));
+    return DateTimeLabels(utils::intersection(vec_lhs, vec_rhs));
 }
-
-
-//DateTimeLabels DateTimeLabels::
-//intersect(const DateTimeLabels& rhs) const{
-//    vector<ptime> vec_lhs(itsData);
-//    vector<ptime> vec_rhs(rhs.itsData);
-//
-//    return DateTimeLabels(utils::intersection(vec_lhs, vec_rhs));
-//}
 
 
 DateTimeLabels DateTimeLabels::

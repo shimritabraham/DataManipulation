@@ -46,12 +46,10 @@ int main(int argc, const char * argv[])
     boost::shared_ptr<TS> ts2 = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GDAXI_dateChg.csv", "%Y-%m-%d", true);
 
     pTS pts1(new TS (ts1->col("GSPC.Close")));
-    pTS pts2(new TS (ts1->col("GSPC.Open")));
-
+    pTS pts2(new TS (ts2->col("GDAXI.Close")));
 
     pLM a = pts1->cbind(pts2);
-    a->head(cout, 3);
-    a->tail(cout, 3);
+    a->head(cout, 10);
 
 
     return 0;

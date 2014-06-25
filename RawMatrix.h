@@ -117,7 +117,8 @@ namespace{
 template<class T>
 boost::shared_ptr<RawMatrix<T>> RawMatrix<T>::
 GetSubsetOfRows(const vector<size_t> rowIndices) const{
-    pRM result(new RawMatrix<T>());
+
+    pRM result(new RawMatrix<T>(rowIndices.size()));
     for(size_t i=0; i<rowIndices.size(); i++){
         result->row(i) = this->row(rowIndices[i]);
     }
