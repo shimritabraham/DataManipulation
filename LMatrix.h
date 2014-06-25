@@ -98,7 +98,7 @@ public:
     void SwapCols(const string& str1, const string& str2);
     ostream& head(ostream& stream, const size_t =5)const;
     ostream& tail(ostream& stream, const size_t =5)const;
-    virtual pLM cbind(const pLM rhs) const;
+    pLM cbind(const pLM rhs) const;
 
 
     // Friends

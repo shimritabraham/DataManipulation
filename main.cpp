@@ -47,10 +47,12 @@ int main(int argc, const char * argv[])
 
     pTS pts1(new TS (ts1->col("GSPC.Close")));
     pTS pts2(new TS (ts2->col("GDAXI.Close")));
+    cout<<(*pts1)<<endl;
 
-    pLM a = pts1->cbind(pts2);
+    pTS a = pts1->cbind(pts2);
+
+    //    TS b = *a;
     a->head(cout, 10);
-
 
     return 0;
     //return igloo::TestRunner::RunAllTests();

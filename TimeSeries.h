@@ -9,7 +9,9 @@
 #ifndef DataManipulation_TimeSeries_h
 #define DataManipulation_TimeSeries_h
 
+#include <memory>
 #include "LMatrix.h"
+#include "boost/shared_ptr.hpp"
 typedef vector<string> strVec;
 
 template<class dataType, class dtContainerType, class dtElementType>
@@ -23,12 +25,13 @@ public:
     typedef LMatrix<dataType, dtContainerType, dtElementType> LM;
     typedef TimeSeries <dataType, dtContainerType, dtElementType> TS;
     typedef boost::shared_ptr<TS> pTS;
+    typedef boost::shared_ptr<LM> pLM;
 
 
     // Con/Destructors
     TimeSeries(const RawMatrix<dataType>& rawData, const dtContainerType& rowNames, const strVec& colNames);
     TimeSeries(boost::shared_ptr<LM> mat);
-    TimeSeries(const LM& mat):LM(mat){}
+    TimeSeries(const LM& mat):LM(mat){ValidateObject();}
     TimeSeries():LM(){};
     ~TimeSeries(){};
 
@@ -47,7 +50,7 @@ public:
     void ValidateObject() const;
     bool is_sorted()      const{return LM::is_sorted();}
     bool is_unique()      const{return LM::is_unique();}
-//    virtual pTS cbind(const pTS rhs) const;
+    pTS cbind(const pTS rhs) const;
 
 };
 
@@ -71,11 +74,16 @@ Union(const TimeSeries<dataType, dtContainerType, dtElementType>& ts1, const Tim
 //--------------------------------------------------------------------------------------------------
 
 
-//template<class dateType, class dtContainerType, class dtElementType>
-//boost::shared_ptr<TimeSeries<dateType, dtContainerType, dtElementType>> TimeSeries<dateType, dtContainerType, dtElementType>::
-//cbind(const pTS rhs) const{
-//
-//}
+
+template<class dateType, class dtContainerType, class dtElementType>
+boost::shared_ptr<TimeSeries<dateType, dtContainerType, dtElementType>> TimeSeries<dateType, dtContainerType, dtElementType>::
+cbind(const pTS rhs) const{
+    pLM LM_result(LM::cbind(rhs));
+
+    // downcast the pointer
+    pTS TS_result(new TS(*LM_result));
+    return TS_result;
+}
 
 
 template<class dateType, class dtContainerType, class dtElementType>
