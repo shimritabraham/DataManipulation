@@ -22,9 +22,9 @@ Context(CreateMatrix){
     // ASK: Unable to find out how to provide a relative path, so using abs path instead
     LMatrix<double, vector<string>, string> mat = LMatrixFactory::CreateSimpleLMatrixFromCsv<double, vector<string>, string>("/Users/shimritabraham/Documents/work/smallfile.csv", true, true);
 
-    // FIXME:
+    // FIXME: Need to investigate igloo more. Postponing this for now.
     // - Check that you can load a LMatrix from a file with/without row/column labels
-    // - Test cout
+    // - Test cout on a small/large matrix
     // etc...
 
 

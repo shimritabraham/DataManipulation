@@ -9,7 +9,7 @@
 #ifndef DataManipulation_LMatrix_h
 #define DataManipulation_LMatrix_h
 
-// FIXME: Check whether you really need all these includes
+// ASK: How do I check whether I really need all these includes? Eclipse used to mark this very nicely in Python code. Not sure how to do this in Xcode. Can VS do this?
 #include <vector>
 #include <string>
 #include <iostream>
@@ -133,6 +133,7 @@ protected:
     rowLabelCollectionType itsRowLabels;
     strVec itsColLabels;
 
+    // cout parameter settings, used to print and align the data nicely
     // ASK: Ideally, these parameters should live in some config file. How do I do this?
     const int fieldWidth = 20;
     const size_t maxCols = 4;
@@ -305,7 +306,6 @@ cbind(const pLM rhs) const {
         return pLM(new LM(*pJoinedRawData, itsRowLabels, newColLabels));
     }
 
-    // FIXME: finish this!
     // Join and sort the rowlabels from both objects
     rowLabelCollectionType newRowLabels = itsRowLabels.intersect(rhs->itsRowLabels);
 
@@ -336,7 +336,7 @@ cbind(const pLM rhs) const {
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>::
 LMatrix(){
-    // FIXME: Would be good to do validation but it will fail.
+    // ASK: Would be good to do validation but it will fail.
     // Problem: I need this constructor elsewhere (do I really?)
 }
 

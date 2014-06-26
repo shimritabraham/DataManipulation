@@ -21,7 +21,6 @@ class RawMatrix{
     // This should not be used directly by the user.
     // Instead, please create a Matrix object using the available MatrixFactory functions
 
-    // FIXME: Initially, this class uses a vector of vectors to store matrix data. This can be enhanced to gain more speed later.
 
 public:
     typedef boost::shared_ptr<RawMatrix<T>> pRM;
@@ -64,7 +63,6 @@ public:
 
 
 private:
-    //ASK: would it be better to make this a shared_ptr to a vector of shared_ptr's instead? To speed it up.
     boost::shared_ptr<vector<vector<T>>> itsPRawMatrixData;
 
 
@@ -139,7 +137,7 @@ AppendToRow(const vector<T> vec, size_t idx){
 template<class T>
 boost::shared_ptr<RawMatrix<T>>  RawMatrix<T>::
 cbind(const pRM rhs) const{
-    // ASK: How do I check that the matrix elements are of the same type? or is that already guaranteed?
+    // ASK: How do I check that the matrices to be joined have similar elements (same type)? or is that already guaranteed?
 
     size_t nRows = GetNrRows();
 
@@ -257,7 +255,7 @@ operator() (const size_t& rowIdx, const size_t& colIdx) const {
 template<class T>
 RawMatrix<T>::
 RawMatrix(){
-    // ASK: Would be good to do validation but it will fail.
+    // ASK: Would be good to do validation but it will fail because it isn't a proper matrix yet.
     // Problem: I need this constructor elsewhere (do I really?)
 }
 

@@ -107,7 +107,7 @@ boost::shared_ptr<TimeSeries<dateType, dtContainerType, dtElementType>> TimeSeri
 cbind(const pTS rhs) const{
     pLM pLM_result(LM::cbind(rhs));
 
-    // ASK: downcasting the pointer here. Is this ok or is there a better way to make cbind() return a TimeSeries pointer?
+    // ASK: downcasting the pointer here. Is this ok or is there a better way to make cbind() return a TimeSeries pointer given that I call LMatrix::cbind?
     pTS TS_result(new TS(*pLM_result));
     return TS_result;
 }
@@ -118,7 +118,7 @@ template<class dateType, class dtContainerType, class dtElementType>
 void TimeSeries<dateType, dtContainerType, dtElementType>::
 ValidateObject() const {
 
-    //ASK: How do I check that dtElementType is some sort of date/time object here?
+    //ASK: How do I check that dtElementType is some sort of date/time object here? (it may be a date/ptime etc)
 
     // Validate the data
     LMatrix<dateType, dtContainerType, dtElementType>::ValidateObject();

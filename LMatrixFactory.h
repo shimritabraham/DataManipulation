@@ -31,7 +31,6 @@ namespace LMatrixFactory{
     boost::shared_ptr<LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>>
     CreateLMatrixFromCsv(const string& fileName, const MatrixType mType,const bool& hasColLabels = false, const bool& hasRowLabels =false, const string rowLabelInputFormat = "");
 
-    // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
 
 
@@ -123,8 +122,6 @@ namespace {
         // 1. No row labels, no column labels are provided in the csv
         // 2. Row labels and/or column labels are provided in the csv
 
-        // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
-
         typedef LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LM;
         vector<string> colNames;
         rowLabelCollectionType rowNames;
@@ -170,11 +167,7 @@ namespace {
         
         // Finally, call the LMatrix constructor (Validation is done inside constructor)
         return boost::shared_ptr<LM> (new LM(rawData, rowNames, colNames) );
-        
-        //ASK: Can I avoid returning by value in this function?
-        
-        
-        
+                
     }
 
 
