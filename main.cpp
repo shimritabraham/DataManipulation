@@ -40,6 +40,7 @@ typedef boost::shared_ptr<LMatrix<double, DateTimeLabels, ptime>> pLM;
 
 int main(int argc, const char * argv[])
 {
+    // settings
     string path = "/Users/shimritabraham/Documents/work/";
     string extension = ".csv";
     vector<string> symbols = {"GSPC", "GDAXI", "FTSE", "IXIC", "N225"};
@@ -47,6 +48,7 @@ int main(int argc, const char * argv[])
     vector<pTSd> to_join;
     string colNameExtension = ".Close";
 
+    // read and process data for each symbol
     for (string s:symbols){
         string fullPath = path+s+extension;
         pTSd ts = TimeSeriesFactory::CreateTimeSeriesFromCsv<double, DateTimeLabels, ptime>(fullPath, SIMPLE, dateTimeFormat, true);
@@ -54,6 +56,7 @@ int main(int argc, const char * argv[])
         to_join.push_back(colToJoin);
     }
 
+    // join the columns
     pTSd joined_cols = join(to_join);
     cout<<(*joined_cols)<<endl;
 
