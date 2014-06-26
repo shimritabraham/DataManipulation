@@ -49,7 +49,7 @@ int main(int argc, const char * argv[])
 
     for (string s:symbols){
         string fullPath = path+s+extension;
-        pTSd ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>(fullPath, dateTimeFormat, true);
+        pTSd ts = TimeSeriesFactory::CreateTimeSeriesFromCsv<double, DateTimeLabels, ptime>(fullPath, SIMPLE, dateTimeFormat, true);
         pTSd colToJoin(new TSd (ts->col(s+colNameExtension)) );
         to_join.push_back(colToJoin);
     }

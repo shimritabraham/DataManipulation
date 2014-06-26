@@ -24,7 +24,7 @@
 using namespace std;
 
 
-// forward-declare the LMatrix class (to enable creation of alias)
+// forward-declare the Labelled Matrix class (to enable creation of aliases)
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 class LMatrix;
 
@@ -42,7 +42,7 @@ typedef vector<string> strVec;
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 class LMatrix{
 
-    // Please use the available LMatrixFactly functions to create instances of this class
+    // Please use the available LMatrixFactory functions to create instances of this class
 
 public:
 
@@ -269,7 +269,7 @@ namespace{
 }
 
 
-//<##>
+
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 pLMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
 join(v_pLMatrix< dataType, rowLabelCollectionType, rowLabelElementType>  vecOfMatrixPtrs){

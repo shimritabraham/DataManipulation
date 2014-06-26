@@ -20,6 +20,7 @@
 using namespace std;
 
 
+enum MatrixType {SIMPLE};// could implement these later: DENSE, SPARSE, RAW, FASTREADONLY
 
 namespace LMatrixFactory{
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,7 +29,7 @@ namespace LMatrixFactory{
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
     boost::shared_ptr<LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>>
-    CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false, const string rowLabelInputFormat = "");
+    CreateLMatrixFromCsv(const string& fileName, const MatrixType mType,const bool& hasColLabels = false, const bool& hasRowLabels =false, const string rowLabelInputFormat = "");
 
     // FIXME: Could add more 'create-functions' e.g. CreateSimpleLMatrixFromVectors(), CreateSpeedyLMatrix(), CreateSparseLMatrix() etc. These would have different RawMatrix<T> implementations depending on the requirements.
 }
@@ -46,6 +47,9 @@ namespace {
     strVec ReadColLabels(istream& fin);
 
 
+    template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+    boost::shared_ptr<LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>>
+    CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels = false, const bool& hasRowLabels =false, const string rowLabelInputFormat = "");
 
 
 
@@ -103,74 +107,101 @@ namespace {
         }
     }
 
+
+
+    template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+    pLMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
+    CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels, const string rowLabelInputFormat){
+
+        // This is a simple labelled matrix implementation that is not optimised for speed.
+
+        // PARAMETERS:
+        // dataType: type of elements that the LMatrix will hold. Can be any class/type
+        // rowLabelCollectionType: any container that respects a minimum set of interface requirements, see the StringLabels or DateTimeLabels classes
+        // rowLabelElementType: has to correspond with the 'rowLabelCollectionType' parameter. Can be string, or boost::posix_time::ptime etc.
+        // Several cases are possible for hasColLabels and hasRowLabels params:
+        // 1. No row labels, no column labels are provided in the csv
+        // 2. Row labels and/or column labels are provided in the csv
+
+        // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
+
+        typedef LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LM;
+        vector<string> colNames;
+        rowLabelCollectionType rowNames;
+        RawMatrix<dataType> rawData;
+        string default_rowLabel_str = "row_";
+        string default_colLabel_str = "col_";
+
+        // simplest case: no labels present in file
+        if(!hasColLabels && !hasRowLabels){
+            rawData = RawMatrix<dataType>(fileName);
+            rowNames.SetDefaultLabels(default_rowLabel_str, rawData.GetNrRows());
+            colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
+
+            // Call constructor (Validation is done inside constructor)
+            return boost::shared_ptr<LM>(new LM(rawData, rowNames, colNames));
+        }
+
+        // Assuming there are row and/or col labels, we need a file handler
+        FileInputManager fmgr(fileName);
+        fmgr.ValidateObject();
+        istream& fin = fmgr.GetStream();
+
+        // first read the col labels -- get it out of the way
+        if(hasColLabels){
+            colNames = ReadColLabels(fin);
+        }
+
+        if(hasRowLabels){
+            // read data and row labels from file
+            boost::shared_ptr<vector<vector<dataType>>> pData(new(vector<vector<dataType>>));
+            ReadFileWithRowNames<dataType, rowLabelCollectionType, rowLabelElementType>(pData, rowNames, fin, rowLabelInputFormat);
+            rawData = RawMatrix<dataType>(pData);
+        }else{
+            // read only the data from file, activate default row labels
+            rawData = RawMatrix<dataType>(fin);
+            rowNames.SetDefaultLabels(default_rowLabel_str, rawData.GetNrRows());
+        }
+
+        // Now that we know the dimensions of the data, we can create default column labels, if needed
+        if(!hasColLabels)
+            colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
+        
+        
+        // Finally, call the LMatrix constructor (Validation is done inside constructor)
+        return boost::shared_ptr<LM> (new LM(rawData, rowNames, colNames) );
+        
+        //ASK: Can I avoid returning by value in this function?
+        
+        
+        
+    }
+
+
 }
 
 
+
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
-boost::shared_ptr<LMatrix<dataType, rowLabelCollectionType, rowLabelElementType>> LMatrixFactory::
-CreateSimpleLMatrixFromCsv(const string& fileName, const bool& hasColLabels, const bool& hasRowLabels, const string rowLabelInputFormat){
-    
-    // This is a simple labelled matrix implementation that is not optimised for speed.
+pLMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LMatrixFactory::
+CreateLMatrixFromCsv(const string& fileName, const MatrixType mType,const bool& hasColLabels, const bool& hasRowLabels, const string rowLabelInputFormat){
 
-    // PARAMETERS:
-    // dataType: type of elements that the LMatrix will hold. Can be any class/type
-    // rowLabelCollectionType: any container that respects a minimum set of interface requirements, see the StringLabels or DateTimeLabels classes
-    // rowLabelElementType: has to correspond with the 'rowLabelCollectionType' parameter. Can be string, or boost::posix_time::ptime etc.
-    // Several cases are possible for hasColLabels and hasRowLabels params:
-    // 1. No row labels, no column labels are provided in the csv
-    // 2. Row labels and/or column labels are provided in the csv
+    switch(mType){
 
-    // ASK: I would like to split this into smaller bits but without adding extra copies-by-value. Discuss issues.
 
-    typedef LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LM;
-    vector<string> colNames;
-    rowLabelCollectionType rowNames;
-    RawMatrix<dataType> rawData;
-    string default_rowLabel_str = "row_";
-    string default_colLabel_str = "col_";
+        case(SIMPLE):
+            return CreateSimpleLMatrixFromCsv<dataType, rowLabelCollectionType, rowLabelElementType>(fileName, hasColLabels, hasRowLabels, rowLabelInputFormat);
+            break;
 
-    // simplest case: no labels present in file
-    if(!hasColLabels && !hasRowLabels){
-        rawData = RawMatrix<dataType>(fileName);
-        rowNames.SetDefaultLabels(default_rowLabel_str, rawData.GetNrRows());
-        colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
 
-        // Call constructor (Validation is done inside constructor)
-        return boost::shared_ptr<LM>(new LM(rawData, rowNames, colNames));
+        default:
+            throw string("ERROR:\t This type of matrix has not been implemented (yet)")+
+            string("\nFILE:\t")+string(__FILE__)+string("\nROW:\t")+to_string(__LINE__);
     }
 
-    // Assuming there are row and/or col labels, we need a file handler
-    FileInputManager fmgr(fileName);
-    fmgr.ValidateObject();
-    istream& fin = fmgr.GetStream();
 
-    // first read the col labels -- get it out of the way
-    if(hasColLabels){
-        colNames = ReadColLabels(fin);
-    }
-
-    if(hasRowLabels){
-        // read data and row labels from file
-        boost::shared_ptr<vector<vector<dataType>>> pData(new(vector<vector<dataType>>));
-        ReadFileWithRowNames<dataType, rowLabelCollectionType, rowLabelElementType>(pData, rowNames, fin, rowLabelInputFormat);
-        rawData = RawMatrix<dataType>(pData);
-    }else{
-        // read only the data from file, activate default row labels
-        rawData = RawMatrix<dataType>(fin);
-        rowNames.SetDefaultLabels(default_rowLabel_str, rawData.GetNrRows());
-    }
-
-    // Now that we know the dimensions of the data, we can create default column labels, if needed
-    if(!hasColLabels)
-        colNames = CreateDefaultLabels(default_colLabel_str, rawData.GetNrCols());
-
-
-    // Finally, call the LMatrix constructor (Validation is done inside constructor)
-    return boost::shared_ptr<LM> (new LM(rawData, rowNames, colNames) );
-
-    //ASK: Can I avoid returning by value in this function?
-
-
+    // Note: code should never get here
+    return pLMatrix<dataType, rowLabelCollectionType, rowLabelElementType>();
 
 }
 
