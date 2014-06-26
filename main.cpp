@@ -29,8 +29,8 @@ using namespace std;
 //#include "Tests_Matrix.h"
 
 
-typedef TimeSeries<double, DateTimeLabels, ptime> TS;
-typedef boost::shared_ptr<TimeSeries<double, DateTimeLabels, ptime>> pTS;
+typedef TimeSeries<double, DateTimeLabels, ptime> TSd;
+typedef boost::shared_ptr<TimeSeries<double, DateTimeLabels, ptime>> pTSd;
 typedef boost::shared_ptr<LMatrix<double, DateTimeLabels, ptime>> pLM;
 
 
@@ -40,19 +40,25 @@ typedef boost::shared_ptr<LMatrix<double, DateTimeLabels, ptime>> pLM;
 
 int main(int argc, const char * argv[])
 {
+    string path = "/Users/shimritabraham/Documents/work/";
+    string extension = ".csv";
+    vector<string> symbols = {"GSPC", "GDAXI", "FTSE", "IXIC", "N225"};
+    string dateTimeFormat = "%Y-%m-%d";
+    vector<pTSd> to_join;
+    string colNameExtension = ".Close";
 
-    //TimeSeries
-    boost::shared_ptr<TS> ts1 = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GSPC.csv", "%Y-%m-%d", true);
-    boost::shared_ptr<TS> ts2 = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>("/Users/shimritabraham/Documents/work/GDAXI_dateChg.csv", "%Y-%m-%d", true);
+    for (string s:symbols){
+        string fullPath = path+s+extension;
+        pTSd ts = TimeSeriesFactory::CreateSimpleTimeSeriesFromCsv<double, DateTimeLabels, ptime>(fullPath, dateTimeFormat, true);
+        pTSd colToJoin(new TSd (ts->col(s+colNameExtension)) );
+        to_join.push_back(colToJoin);
+    }
 
-    pTS pts1(new TS (ts1->col("GSPC.Close")));
-    pTS pts2(new TS (ts2->col("GDAXI.Close")));
-    cout<<(*pts1)<<endl;
+    pTSd joined_cols = join(to_join);
+    cout<<(*joined_cols)<<endl;
 
-    pTS a = pts1->cbind(pts2);
 
-    //    TS b = *a;
-    a->head(cout, 10);
+
 
     return 0;
     //return igloo::TestRunner::RunAllTests();

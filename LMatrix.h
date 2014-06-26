@@ -23,7 +23,21 @@
 #include "boost/shared_ptr.hpp"
 using namespace std;
 
+
+// forward-declare the LMatrix class (to enable creation of alias)
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+class LMatrix;
+
+template<class x, class y, class z>
+using pLMatrix = boost::shared_ptr<LMatrix<x, y, z>>;
+
+template<class x, class y, class z>
+using v_pLMatrix = vector<pLMatrix<x, y, z>>;
+
 typedef vector<string> strVec;
+
+
+
 
 template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
 class LMatrix{
@@ -129,6 +143,23 @@ protected:
 
 
 
+
+
+// Non-member functions
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+pLMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
+join(v_pLMatrix< dataType, rowLabelCollectionType, rowLabelElementType>  vecOfMatrixPtrs);
+
+
+
+
+
+
+// ------------------------------------------------------------
+// Function definitions
+// ------------------------------------------------------------
+
+
 namespace{
     // Helper functions that can only be called from this file
 
@@ -165,7 +196,7 @@ namespace{
         }
         
     }
-//<##>
+
 
     template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
     void PrintLargeLMatrix(ostream& str, LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> mat, const int& fieldWidth, const size_t& maxRows, const size_t& maxCols, const bool printHead, const bool printTail){
@@ -235,6 +266,21 @@ namespace{
         }
 
     }
+}
+
+
+//<##>
+template<class dataType, class rowLabelCollectionType, class rowLabelElementType>
+pLMatrix<dataType, rowLabelCollectionType, rowLabelElementType>
+join(v_pLMatrix< dataType, rowLabelCollectionType, rowLabelElementType>  vecOfMatrixPtrs){
+
+    pLMatrix<dataType, rowLabelCollectionType, rowLabelElementType> result = vecOfMatrixPtrs[0];
+
+    for(size_t i=1; i<vecOfMatrixPtrs.size(); i++){
+        result = result->cbind(vecOfMatrixPtrs[i]);
+    }
+
+    return result;
 }
 
 
