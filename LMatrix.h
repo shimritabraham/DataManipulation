@@ -49,6 +49,7 @@ public:
     typedef LMatrix<dataType, rowLabelCollectionType, rowLabelElementType> LM;
     typedef boost::shared_ptr<LM> pLM;
     typedef boost::shared_ptr<RawMatrix<dataType>> pRM;
+    typedef Eigen::Matrix<dataType, Eigen::Dynamic, Eigen::Dynamic> eigenMatrix;
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Con/De structors ~~~~~~~~~~
@@ -66,17 +67,17 @@ public:
     // ~~~~~~~~~~ Member Functions ~~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // accessors
+    // Accessors
     RawMatrix<dataType> GetRawData(){  return itsRawData;}
     size_t GetNrCols()                    const {return itsRawData.GetNrCols();}
     size_t GetNrRows()                    const {return itsRawData.GetNrRows();}
     strVec GetColLabels()                 const{return itsColLabels;}
     rowLabelCollectionType GetRowLabels() const{return itsRowLabels;}
 
-    // printing
+    // Printing
     std::ostream& operator<< (std::ostream& out);
 
-    // operators -- read/write matrix elements, rows or columns
+    // Operators -- read/write matrix elements, rows or columns
     const dataType& operator() (const size_t& rowIdx, const size_t& colIdx)const {return itsRawData(rowIdx, colIdx);};
           dataType& operator() (const size_t& rowIdx, const size_t& colIdx)      {return itsRawData(rowIdx, colIdx);};
     const dataType& operator() (const rowLabelElementType& rowName, const std::string& colName)const ;
@@ -110,9 +111,12 @@ public:
     void SwapRows(const rowLabelElementType& str1, const rowLabelElementType& str2);
     void SwapCols(const size_t& c1, const size_t& c2);
     void SwapCols(const string& str1, const string& str2);
+    bool is_sorted() const {return itsRowLabels.is_sorted();}
+    bool is_unique() const {return itsRowLabels.is_unique();}
     ostream& head(ostream& stream, const size_t =5)const;
     ostream& tail(ostream& stream, const size_t =5)const;
     pLM cbind(const pLM rhs) const;
+    eigenMatrix asEigenMatrix() const{return itsRawData.asEigenMatrix();}
 
 
     // Friends
@@ -120,10 +124,6 @@ public:
     friend ostream& operator<< (ostream& str,  LMatrix<dt, rlct, rlet>& mat);
 
 protected:
-    bool is_sorted() const {return itsRowLabels.is_sorted();}
-    bool is_unique() const {return itsRowLabels.is_unique();}
-
-
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // ~~~~~~~~~~ Data Members ~~~~~~~~~~~~~~

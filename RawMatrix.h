@@ -14,6 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include "FileInputManager.h"
 #include "Utils.h"
+#include <Eigen/Dense>
 
 
 template<class T>
@@ -22,11 +23,12 @@ class RawMatrix{
     // Instead, please create a Matrix object using the available MatrixFactory functions
 
 
+
 public:
     typedef boost::shared_ptr<RawMatrix<T>> pRM;
     typedef RawMatrix<T> RM;
+    typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> eigenMatrix;
 
-    //<##>
     // Con/Destructors
     RawMatrix(const string& fileName);
     RawMatrix(istream& ifstream);
@@ -35,7 +37,7 @@ public:
     RawMatrix(const size_t& nRows);
     ~RawMatrix(){};
 
-    // accessors
+    // Accessors
     size_t GetNrCols() const {return ((*itsPRawMatrixData)[0]).size();};
     size_t GetNrRows() const {return (*itsPRawMatrixData).size();};
     pRM GetSubsetOfRows(const vector<size_t> rowIndices) const;
@@ -46,16 +48,17 @@ public:
     const vector<T> col(const size_t& idx) const;
           vector<T> col(const size_t& idx);
 
-    // operators -- read/write
+    // Operators -- read/write
     const T& operator() (const size_t& rowIdx, const size_t& colIdx)const;
     T& operator() (const size_t& rowIdx, const size_t& colIdx);
 
-    // Utils functions
+    // Util functions
     void ValidateObject() const;
     void SwapRows(const size_t& r1, const size_t& r2);
     void SwapCols(const size_t& c1, const size_t& c2);
     void AppendToRow(const vector<T> vec, size_t idx);
     pRM cbind(const pRM rhs) const;
+    eigenMatrix asEigenMatrix() const;
 
     // Friend Functions
     template<class S>
@@ -109,8 +112,30 @@ namespace{
         // add row of data to result
         (*result).push_back(vector<T>(istream_iterator<T>(in), istream_iterator<T>()));
     }
-    
 }
+
+
+
+template<class T>
+Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> RawMatrix<T>::
+asEigenMatrix() const{
+
+    typedef Eigen::Matrix<T, Eigen::Dynamic, 1> VectorX;
+
+    size_t nRows = GetNrRows();
+    size_t nCols = GetNrCols();
+
+    eigenMatrix result(nRows, nCols);
+    for (size_t i=0; i<nRows; i++){
+        result.row(i) = VectorX::Map(&(*itsPRawMatrixData)[i][0],(*itsPRawMatrixData)[i].size());
+    }
+
+    return result;
+
+
+}
+
+
 
 template<class T>
 boost::shared_ptr<RawMatrix<T>> RawMatrix<T>::

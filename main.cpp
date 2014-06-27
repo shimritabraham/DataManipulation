@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 #include "Utils.h"
+#include <Eigen/Dense>
+
 
 using namespace boost::posix_time;
 using namespace boost::gregorian;
@@ -37,7 +39,6 @@ typedef boost::shared_ptr<LMatrix<double, DateTimeLabels, ptime>> pLM;
 
 
 
-
 int main(int argc, const char * argv[])
 {
     // settings
@@ -48,7 +49,7 @@ int main(int argc, const char * argv[])
     vector<pTSd> to_join;
     string colNameExtension = ".Close";
 
-    // read and process data for each symbol
+    // Read and process data for each symbol
     for (string s:symbols){
         string fullPath = path+s+extension;
         pTSd ts = TimeSeriesFactory::CreateTimeSeriesFromCsv<double, DateTimeLabels, ptime>(fullPath, SIMPLE, dateTimeFormat, true);
@@ -56,11 +57,13 @@ int main(int argc, const char * argv[])
         to_join.push_back(colToJoin);
     }
 
-    // join the columns
+    // Join the columns
     pTSd joined_cols = join(to_join);
     cout<<(*joined_cols)<<endl;
 
-
+    // Turn TimeSeries into Eigen::Matrix object
+    Eigen::MatrixXd eigenMat = joined_cols->asEigenMatrix();
+    cout<<eigenMat<<endl;
 
 
     return 0;
