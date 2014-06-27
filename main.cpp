@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 sabraham. All rights reserved.
 //
 
+#define EIGEN_MATRIXBASE_PLUGIN "Eigen_MatrixBaseAddons.h" // This HAS to be done first
+
 #include <iostream>
 #include "boost/date_time/local_time/local_time.hpp"
 #include "boost/date_time/posix_time/posix_time.hpp"
@@ -25,7 +27,7 @@
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace std;
-
+using namespace Eigen;
 // Tests
 //#include <igloo/igloo.h>
 //#include "Tests_Matrix.h"
@@ -34,8 +36,6 @@ using namespace std;
 typedef TimeSeries<double, DateTimeLabels, ptime> TSd;
 typedef boost::shared_ptr<TimeSeries<double, DateTimeLabels, ptime>> pTSd;
 typedef boost::shared_ptr<LMatrix<double, DateTimeLabels, ptime>> pLM;
-
-
 
 
 
@@ -64,7 +64,10 @@ int main(int argc, const char * argv[])
     // Turn TimeSeries into Eigen::Matrix object
     Eigen::MatrixXd eigenMat = joined_cols->asEigenMatrix();
     cout<<eigenMat<<endl;
+    cout<<eigenMat(1, 2)<<endl;
 
+
+    
 
     return 0;
     //return igloo::TestRunner::RunAllTests();
