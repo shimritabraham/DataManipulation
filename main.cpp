@@ -65,6 +65,7 @@ int main(int argc, const char * argv[])
     Eigen::MatrixXd eigenMat = joined_cols->asEigenMatrix();
     cout<<eigenMat<<endl;
     cout<<eigenMat(1, 2)<<endl;
+    cout<<eigenMat.myRows()<<endl;
 
 
     
