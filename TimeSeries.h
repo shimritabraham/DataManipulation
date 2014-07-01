@@ -108,6 +108,7 @@ cbind(const pTS rhs) const{
     pLM pLM_result(LM::cbind(rhs));
 
     // ASK: downcasting the pointer here. Is this ok or is there a better way to make cbind() return a TimeSeries pointer given that I call LMatrix::cbind?
+    // SYED: Casting pointers is fine but in this case couldn't the base LMatrix cbind method be used directly? Am skimming so totally possible am missing something.
     pTS TS_result(new TS(*pLM_result));
     return TS_result;
 }
@@ -119,6 +120,7 @@ void TimeSeries<dateType, dtContainerType, dtElementType>::
 ValidateObject() const {
 
     //ASK: How do I check that dtElementType is some sort of date/time object here? (it may be a date/ptime etc)
+    //SYED: Perhaps a TimeSeries ValidateObject() method that checks dt objects and then calls LMatrix ValidateObject()
 
     // Validate the data
     LMatrix<dateType, dtContainerType, dtElementType>::ValidateObject();
