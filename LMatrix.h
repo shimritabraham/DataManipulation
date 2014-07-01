@@ -10,6 +10,8 @@
 #define DataManipulation_LMatrix_h
 
 // ASK: How do I check whether I really need all these includes? Eclipse used to mark this very nicely in Python code. Not sure how to do this in Xcode. Can VS do this?
+// SYED: you can use #pragma once. That will prevent header files being used twice. 
+// SYED: A lot of standard headers can be kept in a pre compiled header file. VS unfortunately not helpful here.
 #include <vector>
 #include <string>
 #include <iostream>
