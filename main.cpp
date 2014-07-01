@@ -105,6 +105,6 @@ int main()
     Eigen::MatrixXd covHolder(logReturns.cols(), logReturns.cols());
     auto rollingCovs = logReturns.Cov_equallyWeightedRolling(covHolder, 4);
     cout<<rollingCovs[0]<<endl;
-    
+
 }
 
