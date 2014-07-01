@@ -11,6 +11,8 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <vector>
+
 
 typedef Eigen::MatrixBase<Derived> EMatB;
 typedef std::shared_ptr<EMatB> pEMatB;
@@ -80,71 +82,75 @@ lnRet(MatrixBase<OtherDerived> const & result_, const int lag = -1) {
 
 
 
-// ------------------------------------------
+// --------------------------------------------------------------
 // Covariance Matrix: Equally weighted past observations
-// ------------------------------------------
+// --------------------------------------------------------------
+
 
 
 template <typename OtherDerived>
-void cov(const MatrixBase<Derived>& x, const MatrixBase<Derived>& y, MatrixBase<OtherDerived> const & C)
+void
+Cov_equallyWeightedAllData(MatrixBase<OtherDerived> const & result) const
 {
     typedef typename Derived::Scalar Scalar;
     typedef typename internal::plain_row_type<Derived>::type RowVectorType;
-    const Scalar num_observations = static_cast<Scalar>(x.rows());
+    const Scalar num_observations = static_cast<Scalar>(this->rows());
 
-    const RowVectorType x_mean = x.colwise().sum() / num_observations;
-    const RowVectorType y_mean = y.colwise().sum() / num_observations;
+    const RowVectorType colMeans = this->colwise().sum() / num_observations;
 
-    const_cast< MatrixBase<OtherDerived>& >(C) =
-        (x.rowwise() - x_mean).transpose() * (y.rowwise() - y_mean) / (num_observations-1);
+    const_cast< MatrixBase<OtherDerived>& >(result) =
+    (this->rowwise() - colMeans).transpose() * (this->rowwise() - colMeans) / (num_observations-1);
+
 }
 
-//
-//template <typename OtherDerived>
-//void
-//Cov_equallyWeightedAllData(MatrixBase<OtherDerived> const & result_)const{
-//    // recommmended hack: get rid of constness in result
-//    MatrixBase<OtherDerived>& result = const_cast< MatrixBase<OtherDerived>& >(result_);
-//    result.derived().resize(this->cols(), this->cols());
-//
-//    const MatrixBase<Derived>> x_mean = this->colwise().sum();
-////    return pEMatB(new EMatB ((centered.transpose() * centered)/double(this->rows()))  );
-//}
 
-//
-//pEMatB
-//Cov_equallyWeighted(const int lookback = -1) {
-//    // lookback<0 means 'use all data'
-//
-//    Index N = this->rows();
-//
-//    if (lookback<0){
-//        // use all data to compute covariance matrix
-//        return this->Cov_EquallyWeightedAllData();
-//
-//    }else{
-//
-//        // compute rolling covariance matrix
-//        if(N<lookback+2)
-//            throw std::string("ERROR:\t Lookback parameter too large compared to nr of rows in Matrix")+
-//            std::string("\nFILE:\t")+std::string(__FILE__)+std::string("\nROW:\t")+std::to_string(__LINE__);
-//        return this->bottomRows(lookback)->Cov_EquallyWeighted();
-//    }
-//
-//}
+template <typename OtherDerived>
+void
+Cov_equallyWeighted(MatrixBase<OtherDerived> const & result_, const Index lookback) {
+
+    // hack recommended by documentation
+    MatrixBase<OtherDerived>& result = const_cast< MatrixBase<OtherDerived>& >(result_);
+    result.derived().resize(this->cols(), this->cols());
+
+    // call cov function that uses all data on bottomrows section of the matrix
+    this->bottomRows(lookback).Cov_equallyWeightedAllData(result);
+}
 
 
+template <typename OtherDerived>
+std::vector<  OtherDerived  >
+Cov_equallyWeightedRolling(MatrixBase<OtherDerived>  const & matHolder_, const Index lookback) {
 
-v_pEMatB Cov_equallyWeightedRolling(const uint lookback) const;
+    // validate input
+    if(lookback>=this->rows()){
+        throw std::string("ERROR:\t Lookback parameter is too large compared to matrix rows.")+
+        std::string("\nFILE:\t")+std::string(__FILE__)+std::string("\nROW:\t")+std::to_string(__LINE__);
+    }
+
+    // hack recommended by documentation
+    MatrixBase<OtherDerived>& matHolder = const_cast< MatrixBase<OtherDerived>& >(matHolder_);
+    matHolder.derived().resize(this->cols(), this->cols());
+
+
+    typedef typename internal::plain_matrix_type<OtherDerived>::type plain_mat;
+    std::vector<plain_mat> result;
+
+    // compute rolling cov matrix
+    for(Index i=lookback; i<this->rows(); i++){
+        this->topRows(i).Cov_equallyWeighted(matHolder, lookback);
+        result.push_back(matHolder);
+    }
+
+    return result;
+}
 
 
 
 
 
-
-// ------------------------------------------
+// --------------------------------------------------------------
 // Covariance Matrix: EWMA-weighted past observations
-// ------------------------------------------
+// --------------------------------------------------------------
 pEMatB Cov_ewmaWeighted(const double lambda) const;
 v_pEMatB Cov_ewmaWeightedRolling(const double lambda) const;
 

@@ -87,29 +87,24 @@ using namespace std;
 int main()
 {
     Eigen::Matrix<double, 7, 3, Eigen::RowMajor> a;
+    a<< 1, 2, 3,
+        1, 5, 3,
+        3, 3, 3,
+        15, 2, 3,
+        78, 12, 88,
+        90, 5, 9,
+        1, 22, 33;
 
-    vector<double> r1{1, 2, 3};
-    vector<double> r2{1, 5, 3};
-    vector<double> r3{3, 3, 3};
-    vector<double> r4{15, 2, 3};
-    vector<double> r5{78, 12, 88};
-    vector<double> r6{90, 5, 9};
-    vector<double> r7{1, 22, 33};
 
-    vector<vector<double>> allVec{r1, r2, r3, r4, r5, r6, r7};
+    // compute log returns
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> logReturns;
+    a.lnRet(logReturns, 1);
 
-    for (int i = 0; i < 7; i++)
-        a.row(i) = Eigen::Matrix<double, 3, 1>::Map(&allVec[i][0],allVec[i].size());
 
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> res;
-    cout<<a<<endl;
-    cout<<endl;
-    a.lnRet(res, 1);
-    cout<<res<<endl;
-//    a.Cov_equallyWeightedAllData(res);
-    a.cov(a, a, res);
-    cout<<res<<endl;
-
+    // compute rolling covariance matrices
+    Eigen::MatrixXd covHolder(logReturns.cols(), logReturns.cols());
+    auto rollingCovs = logReturns.Cov_equallyWeightedRolling(covHolder, 4);
+    cout<<rollingCovs[0]<<endl;
     
 }
 
